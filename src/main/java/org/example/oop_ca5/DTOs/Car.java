@@ -1,15 +1,15 @@
 package org.example.oop_ca5.DTOs;
 
 public class Car {
-    private int id;
+    private int carID;
     private String make;
     private String model;
     private int year;
     private float rentalPricePerDay;
     private boolean availability;
 
-    public Car(int id, String make, String model, int year, float rentalPricePerDay, boolean availability) {
-        this.id = id;
+    public Car(int carID, String make, String model, int year, float rentalPricePerDay, boolean availability) {
+        this.carID = carID;
         this.make = make;
         this.model = model;
         this.year = year;
@@ -18,12 +18,12 @@ public class Car {
     }
 
     // getters and setters
-    public int getId() {
-        return id;
+    public int getCarId() {
+        return carID;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setCarId(int id) {
+        this.carID = id;
     }
 
     public String getMake() {
@@ -64,6 +64,12 @@ public class Car {
 
     public void setAvailability(boolean availability) {
         this.availability = availability;
+    }
+
+    @Override
+    public String toString() {
+        return "Car { ID: " + carID + ", Make: " + make + ", Model: " + model + ", Year: " + year
+                + ", Rental Price Per Day: " + rentalPricePerDay + ", Availability: " + availability + " }";
     }
 }
 
