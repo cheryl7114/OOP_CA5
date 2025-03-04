@@ -17,6 +17,16 @@ public class Car {
         this.availability = availability;
     }
 
+    public Car(String make, String model, int year, float rentalPricePerDay, boolean availability) {
+        this.make = make;
+        this.model = model;
+        this.year = year;
+        this.rentalPricePerDay = rentalPricePerDay;
+        this.availability = availability;
+    }
+
+    public Car() {}
+
     // getters and setters
     public int getCarId() {
         return carID;

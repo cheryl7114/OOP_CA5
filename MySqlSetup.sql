@@ -1,9 +1,9 @@
 CREATE DATABASE IF NOT EXISTS CarRental;
 USE CarRental;
 
-DROP TABLE IF EXISTS Car;
+DROP TABLE IF EXISTS car;
 
-CREATE TABLE Car (
+CREATE TABLE car (
     carID INT AUTO_INCREMENT PRIMARY KEY,
     make VARCHAR(100) NOT NULL,
     model VARCHAR(100) NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE Car (
     availability BOOLEAN NOT NULL DEFAULT TRUE
 );
 
-INSERT INTO Car (make, model, year, rentalPricePerDay, availability) VALUES
+INSERT INTO car (make, model, year, rentalPricePerDay, availability) VALUES
 ('Toyota', 'Corolla', 2020, 45.99, TRUE),
 ('Honda', 'Civic', 2021, 50.00, TRUE),
 ('Ford', 'Focus', 2019, 40.00, FALSE),
