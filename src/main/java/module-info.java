@@ -10,6 +10,7 @@ module org.example.oop_ca5 {
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
+    requires java.sql;
 
     opens org.example.oop_ca5 to javafx.fxml;
     exports org.example.oop_ca5;
