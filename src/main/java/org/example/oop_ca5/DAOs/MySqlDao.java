@@ -9,7 +9,7 @@ import org.example.oop_ca5.Exceptions.DaoException;
 public class MySqlDao {
     public Connection getConnection() throws DaoException {
         String driver = "com.mysql.cj.jdbc.Driver";
-        String url = "jdbc:mysql://localhost:3306/expenseTracker_CA4";
+        String url = "jdbc:mysql://localhost:3306/CarRental";
         String username = "root";
         String password = "";
         Connection connection = null;
