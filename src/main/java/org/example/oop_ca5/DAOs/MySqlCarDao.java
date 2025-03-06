@@ -72,7 +72,7 @@ public class MySqlCarDao extends MySqlDao implements CarDaoInterface {
             int rowsAffected = preparedStatement.executeUpdate();
 
             if (rowsAffected == 0) {
-                throw new DaoException("No expense found with ID: " + carID);
+                throw new DaoException("No car found with ID: " + carID);
             }
 
         } catch (SQLException e) {
