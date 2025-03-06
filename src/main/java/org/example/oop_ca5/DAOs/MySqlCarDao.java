@@ -7,7 +7,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MySqlCarDao extends MySqlDao {
+public class MySqlCarDao extends MySqlDao implements CarDaoInterface {
+
+    @Override
     public List<Car> loadAllCars() throws DaoException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -30,7 +32,7 @@ public class MySqlCarDao extends MySqlDao {
                 float rentalPricePerDay = resultSet.getFloat("rentalPricePerDay");
                 boolean availability = resultSet.getBoolean("availability");
 
-                Car car = new Car();
+                Car car = new Car(carID, make, model, year, rentalPricePerDay, availability);
                 carList.add(car);
             }
         } catch (SQLException e) {
@@ -52,5 +54,40 @@ public class MySqlCarDao extends MySqlDao {
         }
 
         return carList;
+    }
+
+    @Override
+    public void deleteCar(int carID) {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+
+        try {
+            // get connection using getConnection() method from MySqlDao.java
+            connection = this.getConnection();
+
+            String query = "DELETE FROM car WHERE carID=?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, carID);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            if (rowsAffected == 0) {
+                throw new DaoException("No expense found with ID: " + carID);
+            }
+
+        } catch (SQLException e) {
+            throw new DaoException("deleteCar() " + e.getMessage());
+        } finally {
+            try {
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+                if (connection != null) {
+                    freeConnection(connection);
+                }
+            } catch (SQLException e) {
+                System.err.println("Error closing resources: " + e.getMessage());
+            }
+        }
     }
 }
