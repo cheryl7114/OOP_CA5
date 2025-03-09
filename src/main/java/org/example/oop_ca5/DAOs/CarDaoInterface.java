@@ -9,4 +9,5 @@ public interface CarDaoInterface {
     Car findCarById(int carID) throws DaoException;
     void deleteCarById(int carID) throws DaoException;
     Car insertCar(Car car) throws DaoException;
+    Car updateCar(Car car) throws DaoException;
 }
