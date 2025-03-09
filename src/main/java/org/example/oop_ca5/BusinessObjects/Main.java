@@ -25,7 +25,7 @@ public class Main {
             System.out.println("3. Delete Car by ID");
             System.out.println("4. Insert a New Car");
             System.out.println("5. Update Car Details");
-            System.out.println("6. Find Cars by Filter");
+            System.out.println("6. Show Cars Available To Rent");
             System.out.println("7. Exit");
 
             int choice = -1; // ensure to get a valid value
@@ -49,7 +49,7 @@ public class Main {
 
             switch (choice) {
                 case 1:
-                    displayAllCars(carList);
+                    displayCarList(carList);
                     break;
                 case 2:
                     findCarById(scanner);
@@ -64,7 +64,8 @@ public class Main {
                     updateCar(scanner);
                     break;
                 case 6:
-                    findCarsByFilter();
+                    List<Car> availableCars = getAvailableCars();
+                    displayCarList(availableCars);
                     break;
                 case 7:
                     exit = true;
@@ -86,7 +87,7 @@ public class Main {
         }
     }
 
-    private static void displayAllCars(List<Car> carList) {
+    private static void displayCarList(List<Car> carList) {
         if (carList.isEmpty()) {
             System.out.println("No cars found!");
         } else {
@@ -183,10 +184,14 @@ public class Main {
         }
     }
 
-    private static void findCarsByFilter() {
+    public static List<Car> getAvailableCars() throws DaoException {
+        try {
+            return carDao.getAvailableCars();
+        } catch (DaoException e) {
+            System.err.println("Error retrieving cars: " + e.getMessage());
+            throw e;
+        }
     }
-
-
 
     public static int validateCarID(Scanner scanner) {
         while (!scanner.hasNextInt()) {
