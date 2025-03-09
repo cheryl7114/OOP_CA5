@@ -9,13 +9,14 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-    // create DAO objects
     public static CarDaoInterface carDao = new MySqlCarDao();
 
     public static void main(String[] args) throws DaoException {
         Scanner scanner = new Scanner(System.in);
         boolean exit = false;
-        List<Car> carList = carDao.loadAllCars();
+
+        // Load all cars from the database
+        List<Car> carList = loadAllCars();
 
         while (!exit) {
             System.out.println("\n----- Car Rental Management System -----");
@@ -44,12 +45,11 @@ public class Main {
                     scanner.next(); // Discard invalid input
                 }
             }
-
             scanner.nextLine();
 
             switch (choice) {
                 case 1:
-                    loadAllCars();
+                    displayAllCars(carList);
                     break;
                 case 2:
                     findCarById(scanner);
@@ -77,15 +77,12 @@ public class Main {
         scanner.close();
     }
 
-    private static void loadAllCars() {
+    private static List<Car> loadAllCars() throws DaoException {
         try {
-            List<Car> carList = carDao.loadAllCars();
-            System.out.println("\n--- All Cars ---");
-            for (Car car : carList) {
-                System.out.println(car);
-            }
+            return carDao.loadAllCars();
         } catch (DaoException e) {
             System.err.println("Error retrieving cars: " + e.getMessage());
+            throw e;
         }
     }
 
@@ -109,7 +106,6 @@ public class Main {
         } catch (DaoException e) {
             System.err.println("Error finding car: " + e.getMessage());
         }
-
     }
 
     private static void deleteCarById(Scanner scanner) {
@@ -189,6 +185,8 @@ public class Main {
 
     private static void findCarsByFilter() {
     }
+
+
 
     public static int validateCarID(Scanner scanner) {
         while (!scanner.hasNextInt()) {
