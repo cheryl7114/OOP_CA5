@@ -1,4 +1,4 @@
-package org.example.oop_ca5.BuisnessObjects;
+package org.example.oop_ca5.BusinessObjects;
 
 import org.example.oop_ca5.DAOs.CarDaoInterface;
 import org.example.oop_ca5.DAOs.MySqlCarDao;
@@ -11,9 +11,11 @@ import java.util.Scanner;
 public class Main {
     // create DAO objects
     public static CarDaoInterface carDao = new MySqlCarDao();
+
     public static void main(String[] args) throws DaoException {
         Scanner scanner = new Scanner(System.in);
         boolean exit = false;
+        List<Car> carList = carDao.loadAllCars();
 
         while (!exit) {
             System.out.println("\n----- Car Rental Management System -----");
@@ -47,19 +49,19 @@ public class Main {
 
             switch (choice) {
                 case 1:
-                    loadAllCars(carDao);
+                    loadAllCars();
                     break;
                 case 2:
-                    findCarById(scanner, carDao);
+                    findCarById(scanner);
                     break;
                 case 3:
-                    deleteCarById(scanner, carDao);
+                    deleteCarById(scanner);
                     break;
                 case 4:
-                    insertCar(scanner, carDao);
+                    insertCar(scanner);
                     break;
                 case 5:
-                    updateCar(scanner, carDao);
+                    updateCar(scanner);
                     break;
                 case 6:
                     findCarsByFilter();
@@ -75,7 +77,7 @@ public class Main {
         scanner.close();
     }
 
-    private static void loadAllCars(CarDaoInterface carDao) {
+    private static void loadAllCars() {
         try {
             List<Car> carList = carDao.loadAllCars();
             System.out.println("\n--- All Cars ---");
@@ -87,7 +89,17 @@ public class Main {
         }
     }
 
-    private static void findCarById(Scanner scanner, CarDaoInterface carDao) {
+    private static void displayAllCars(List<Car> carList) {
+        if (carList.isEmpty()) {
+            System.out.println("No cars found!");
+        } else {
+            for (Car car : carList) {
+                System.out.println(car);
+            }
+        }
+    }
+
+    private static void findCarById(Scanner scanner) {
         System.out.println("Enter Car ID to find: ");
         int carID = validateCarID(scanner);
         try {
@@ -100,7 +112,7 @@ public class Main {
 
     }
 
-    private static void deleteCarById(Scanner scanner, CarDaoInterface carDao) {
+    private static void deleteCarById(Scanner scanner) {
         System.out.print("Enter Car ID to delete: ");
         int carID = validateCarID(scanner);
         try {
@@ -111,7 +123,7 @@ public class Main {
         }
     }
 
-    private static void insertCar(Scanner scanner, CarDaoInterface carDao) {
+    private static void insertCar(Scanner scanner) {
         System.out.print("Enter Make: ");
         String make = scanner.nextLine();
         System.out.print("Enter Model: ");
@@ -132,7 +144,7 @@ public class Main {
         }
     }
 
-    private static void updateCar(Scanner scanner, CarDaoInterface carDao) {
+    private static void updateCar(Scanner scanner) {
         System.out.println("Enter car ID to update: ");
         int carID = validateCarID(scanner);
         scanner.nextLine(); // consume newline character
