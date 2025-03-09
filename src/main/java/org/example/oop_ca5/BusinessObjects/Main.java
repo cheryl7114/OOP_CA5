@@ -19,32 +19,8 @@ public class Main {
         List<Car> carList = loadAllCars();
 
         while (!exit) {
-            System.out.println("\n----- Car Rental Management System -----");
-            System.out.println("1. View All Cars");
-            System.out.println("2. Find Car by ID");
-            System.out.println("3. Delete Car by ID");
-            System.out.println("4. Insert a New Car");
-            System.out.println("5. Update Car Details");
-            System.out.println("6. Show Cars Available To Rent");
-            System.out.println("7. Exit");
-
-            int choice = -1; // ensure to get a valid value
-            boolean validChoice = false;
-
-            while (!validChoice) {
-                System.out.print("Enter your choice: ");
-                if (scanner.hasNextInt()) {
-                    choice = scanner.nextInt();
-                    if (choice >= 0 && choice <= 7) {
-                        validChoice = true; // Valid choice
-                    } else {
-                        System.out.println("Invalid choice! Please enter a number between 0 and 7.");
-                    }
-                } else {
-                    System.out.println("Invalid input! Please enter a number.");
-                    scanner.next(); // Discard invalid input
-                }
-            }
+            displayMenu();
+            int choice = getValidChoice(scanner);
             scanner.nextLine();
 
             switch (choice) {
@@ -76,6 +52,34 @@ public class Main {
             }
         }
         scanner.close();
+    }
+
+    private static void displayMenu() {
+        System.out.println("\n----- Car Rental Management System -----");
+        System.out.println("1. View All Cars");
+        System.out.println("2. Find Car by ID");
+        System.out.println("3. Delete Car by ID");
+        System.out.println("4. Insert a New Car");
+        System.out.println("5. Update Car Details");
+        System.out.println("6. Show Cars Available To Rent");
+        System.out.println("7. Exit");
+    }
+
+    private static int getValidChoice(Scanner scanner) {
+        int choice = -1;
+        while (choice < 1 || choice > 7) {  // Keep looping until a valid choice is given
+            System.out.print("Enter your choice: ");
+            if (scanner.hasNextInt()) {
+                choice = scanner.nextInt();
+                if (choice < 1 || choice > 7) {
+                    System.out.println("Invalid choice! Please enter a number between 1 and 7.");
+                }
+            } else {
+                System.out.println("Invalid input! Please enter a number.");
+                scanner.next(); // Discard invalid input
+            }
+        }
+        return choice;
     }
 
     private static List<Car> loadAllCars() throws DaoException {
@@ -147,7 +151,7 @@ public class Main {
         scanner.nextLine(); // consume newline character
         try {
             Car existingCar = carDao.findCarById(carID);
-            
+
             System.out.println("Current car details: ");
             System.out.println(existingCar.toString());
             System.out.println("\n Leave any blank to keep the existing value");
