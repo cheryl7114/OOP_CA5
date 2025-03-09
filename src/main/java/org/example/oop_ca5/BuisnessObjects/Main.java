@@ -139,6 +139,35 @@ public class Main {
         try {
             Car existingCar = carDao.findCarById(carID);
             
+            System.out.println("Current car details: ");
+            System.out.println(existingCar.toString());
+            System.out.println("\n Leave any blank to keep the existing value");
+
+            // if input is empty, keep the existing value else get the updated value
+            System.out.println(" Car Make [" + existingCar.getMake() + "]: ");
+            String makeInput = scanner.nextLine();
+            String make = makeInput.isEmpty() ? existingCar.getMake() : makeInput;
+
+            System.out.println(" Car Model [" + existingCar.getModel() + "]: ");
+            String modelInput  = scanner.nextLine();
+            String model = modelInput.isEmpty() ? existingCar.getModel() : modelInput;
+
+            System.out.println(" Car Year [" + existingCar.getYear() + "]: ");
+            String yearInput = scanner.nextLine();
+            int year = yearInput.isEmpty() ? existingCar.getYear() : Integer.parseInt(yearInput);
+
+            System.out.println(" Car Rental Price [" + existingCar.getRentalPricePerDay() + "]: ");
+            String rentalPriceInput = scanner.nextLine();
+            float rentalPrice = rentalPriceInput.isEmpty() ? existingCar.getRentalPricePerDay() : Float.parseFloat(rentalPriceInput);
+
+            System.out.println(" Car Availability [" + existingCar.isAvailable() + "]: ");
+            String availabilityInput = scanner.nextLine();
+            boolean availability = availabilityInput.isEmpty() ? existingCar.isAvailable() : Boolean.parseBoolean(availabilityInput);
+
+            Car updatedCar = new Car(carID, make, model, year, rentalPrice, availability);
+            Car result = carDao.updateCar(updatedCar);
+
+            System.out.println("Updated Car: " + result.toString());
         } catch (NumberFormatException e) {
             System.err.println("Invalid input! Please enter a number!");
         } catch (DaoException e) {
