@@ -90,4 +90,55 @@ public class MySqlCarDao extends MySqlDao implements CarDaoInterface {
             }
         }
     }
+
+    @Override
+    public Car insertCar(Car car) throws DaoException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet generatedKeys = null;
+
+        try {
+            connection = this.getConnection();
+
+            String query = "INSERT INTO car (make, model, year, rentalPricePerDay, availability) VALUES (?, ?, ?, ?, ?)";
+            preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+
+            preparedStatement.setString(1, car.getMake());
+            preparedStatement.setString(2, car.getModel());
+            preparedStatement.setInt(3, car.getYear());
+            preparedStatement.setFloat(4, car.getRentalPricePerDay());
+            preparedStatement.setBoolean(5, car.isAvailable());
+
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            if (rowsAffected == 0) {
+                throw new DaoException("No car was inserted.");
+            }
+
+            generatedKeys = preparedStatement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                int generatedId = generatedKeys.getInt(1);
+                return new Car(generatedId, car.getMake(), car.getModel(), car.getYear(), car.getRentalPricePerDay(), car.isAvailable());
+            } else {
+                throw new DaoException("Failed to retrieve generated carID.");
+            }
+
+        } catch (SQLException e) {
+            throw new DaoException("insertCar() " + e.getMessage());
+        } finally {
+            try {
+                if (generatedKeys != null) {
+                    generatedKeys.close();
+                }
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+                if (connection != null) {
+                    freeConnection(connection);
+                }
+            } catch (SQLException e) {
+                System.err.println("Error closing resources: " + e.getMessage());
+            }
+        }
+    }
 }

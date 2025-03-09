@@ -68,8 +68,8 @@ public class Car {
         this.rentalPricePerDay = rentalPricePerDay;
     }
 
-    public boolean isAvailability() {
-        return availability;
+    public boolean isAvailable() {
+        return available;
     }
 
     public void setAvailability(boolean availability) {

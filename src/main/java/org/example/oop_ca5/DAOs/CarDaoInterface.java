@@ -9,4 +9,6 @@ public interface CarDaoInterface {
     List<Car> loadAllCars() throws DaoException;
 
     void deleteCar(int carID);
+
+    Car insertCar(Car car) throws DaoException;
 }
