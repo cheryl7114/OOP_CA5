@@ -1,4 +1,4 @@
-package org.example.oop_ca5;
+package org.example.oop_ca5.GUI;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;

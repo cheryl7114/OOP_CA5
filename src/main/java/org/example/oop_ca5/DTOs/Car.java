@@ -69,7 +69,7 @@ public class Car {
     }
 
     public boolean isAvailable() {
-        return available;
+        return availability;
     }
 
     public void setAvailability(boolean availability) {

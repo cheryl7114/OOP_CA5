@@ -11,7 +11,7 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        CarDaoInterface carDao = new MySqlCarDao(); //allow interaction with database
+        CarDaoInterface carDao = new MySqlCarDao(); // allow interaction with database
         boolean exit = false;
 
         while (!exit) {
@@ -22,12 +22,10 @@ public class Main {
             System.out.println("4. Insert a New Car");
             System.out.println("5. Update Car Details");
             System.out.println("6. Find Cars by Filter");
-            System.out.println("0. Exit");
-            System.out.print("Enter choice: ");
+            System.out.println("7. Exit");
 
-            int choice = -1; //ensure to get a valid value
+            int choice = -1; // ensure to get a valid value
             boolean validChoice = false;
-
 
             while (!validChoice) {
                 System.out.print("Enter your choice: ");
@@ -51,7 +49,7 @@ public class Main {
                     loadAllCars(carDao);
                     break;
                 case 2:
-                    findCarById();
+                    findCarById(scanner, carDao);
                     break;
                 case 3:
                     deleteCarById(scanner, carDao);
@@ -88,7 +86,18 @@ public class Main {
         }
     }
 
-    private static void findCarById() {}
+    private static void findCarById(Scanner scanner, CarDaoInterface carDao) {
+        System.out.println("Enter Car ID to find: ");
+        int carID = scanner.nextInt();
+        try {
+            Car car = carDao.findCarById(carID);
+            System.out.println("Car found!");
+            System.out.println(car.toString());
+        } catch (DaoException e) {
+            System.err.println("Error finding car: " + e.getMessage());
+        }
+
+    }
 
     private static void deleteCarById(Scanner scanner, CarDaoInterface carDao) {
         System.out.print("Enter Car ID to delete: ");
@@ -124,6 +133,7 @@ public class Main {
 
     private static void updateCar() {}
 
-    private static void findCarsByFilter() {}
+    private static void findCarsByFilter() {
+    }
 
 }
