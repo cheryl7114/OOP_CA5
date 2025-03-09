@@ -68,7 +68,7 @@ public class Main {
     private static int getValidChoice(Scanner scanner) {
         int choice = -1;
         while (choice < 1 || choice > 7) {  // Keep looping until a valid choice is given
-            System.out.print("Enter your choice: ");
+            System.out.print("\nEnter your choice: ");
             if (scanner.hasNextInt()) {
                 choice = scanner.nextInt();
                 if (choice < 1 || choice > 7) {
@@ -93,7 +93,7 @@ public class Main {
 
     private static void displayCarList(List<Car> carList) {
         if (carList.isEmpty()) {
-            System.out.println("No cars found!");
+            System.out.println("\nNo cars found!");
         } else {
             for (Car car : carList) {
                 System.out.println(car);
@@ -102,7 +102,7 @@ public class Main {
     }
 
     private static void findCarById(Scanner scanner) {
-        System.out.println("Enter Car ID to find: ");
+        System.out.print("\nEnter Car ID to find: ");
         int carID = validateCarID(scanner);
         try {
             Car car = carDao.findCarById(carID);
@@ -114,7 +114,7 @@ public class Main {
     }
 
     private static void deleteCarById(Scanner scanner) {
-        System.out.print("Enter Car ID to delete: ");
+        System.out.print("\nEnter Car ID to delete: ");
         int carID = validateCarID(scanner);
         try {
             carDao.deleteCarById(carID);
@@ -125,7 +125,7 @@ public class Main {
     }
 
     private static void insertCar(Scanner scanner) {
-        System.out.print("Enter Make: ");
+        System.out.print("\nEnter Make: ");
         String make = scanner.nextLine();
         System.out.print("Enter Model: ");
         String model = scanner.nextLine();
@@ -146,7 +146,7 @@ public class Main {
     }
 
     private static void updateCar(Scanner scanner) {
-        System.out.println("Enter car ID to update: ");
+        System.out.println("\nEnter car ID to update: ");
         int carID = validateCarID(scanner);
         scanner.nextLine(); // consume newline character
         try {
