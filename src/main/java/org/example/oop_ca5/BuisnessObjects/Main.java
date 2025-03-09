@@ -9,13 +9,14 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+    // create DAO objects
+    public static CarDaoInterface carDao = new MySqlCarDao();
+    public static void main(String[] args) throws DaoException {
         Scanner scanner = new Scanner(System.in);
-        CarDaoInterface carDao = new MySqlCarDao(); // allow interaction with database
         boolean exit = false;
 
         while (!exit) {
-            System.out.println("----- Car Rental Management System -----");
+            System.out.println("\n----- Car Rental Management System -----");
             System.out.println("1. View All Cars");
             System.out.println("2. Find Car by ID");
             System.out.println("3. Delete Car by ID");
@@ -58,7 +59,7 @@ public class Main {
                     insertCar(scanner, carDao);
                     break;
                 case 5:
-                    updateCar();
+                    updateCar(scanner, carDao);
                     break;
                 case 6:
                     findCarsByFilter();
@@ -88,7 +89,7 @@ public class Main {
 
     private static void findCarById(Scanner scanner, CarDaoInterface carDao) {
         System.out.println("Enter Car ID to find: ");
-        int carID = scanner.nextInt();
+        int carID = validateCarID(scanner);
         try {
             Car car = carDao.findCarById(carID);
             System.out.println("Car found!");
@@ -101,7 +102,7 @@ public class Main {
 
     private static void deleteCarById(Scanner scanner, CarDaoInterface carDao) {
         System.out.print("Enter Car ID to delete: ");
-        int carID = scanner.nextInt();
+        int carID = validateCarID(scanner);
         try {
             carDao.deleteCarById(carID);
             System.out.println("Car with ID " + carID + " deleted successfully.");
@@ -131,11 +132,28 @@ public class Main {
         }
     }
 
-    private static void updateCar() {
-        
+    private static void updateCar(Scanner scanner, CarDaoInterface carDao) {
+        System.out.println("Enter car ID to update: ");
+        int carID = validateCarID(scanner);
+        scanner.nextLine(); // consume newline character
+        try {
+            Car existingCar = carDao.findCarById(carID);
+            
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid input! Please enter a number!");
+        } catch (DaoException e) {
+            System.err.println("Error finding car: " + e.getMessage());
+        }
     }
 
     private static void findCarsByFilter() {
     }
 
+    public static int validateCarID(Scanner scanner) {
+        while (!scanner.hasNextInt()) {
+            System.out.println("Invalid input! Please enter a number!");
+            scanner.next();
+        }
+        return scanner.nextInt();
+    }
 }
