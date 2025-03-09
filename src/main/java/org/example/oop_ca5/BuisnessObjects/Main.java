@@ -63,7 +63,7 @@ public class Main {
                 case 6:
                     findCarsByFilter();
                     break;
-                case 0:
+                case 7:
                     exit = true;
                     System.out.println("Exiting Car Manager...");
                     break;
@@ -131,7 +131,9 @@ public class Main {
         }
     }
 
-    private static void updateCar() {}
+    private static void updateCar() {
+        
+    }
 
     private static void findCarsByFilter() {
     }
