@@ -12,6 +12,17 @@ CREATE TABLE car (
     availability BOOLEAN NOT NULL DEFAULT TRUE
 );
 
+CREATE TABLE customer (
+    customerID INT AUTO_INCREMENT PRIMARY KEY,
+    customerName VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE rental (
+
+)
+
 INSERT INTO car (make, model, year, rentalPricePerDay, availability) VALUES
 ('Toyota', 'Corolla', 2020, 45.99, TRUE),
 ('Honda', 'Civic', 2021, 50.00, TRUE),
