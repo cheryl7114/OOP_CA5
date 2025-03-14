@@ -16,12 +16,21 @@ CREATE TABLE customer (
     customerID INT AUTO_INCREMENT PRIMARY KEY,
     customerName VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    password VARCHAR(100) NOT NULL
+    phone VARCHAR(15) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE rental (
+    rentalID INT AUTO_INCREMENT PRIMARY KEY,
+    customerID INT NOT NULL,
+    carID INT NOT NULL,
+    startDate DATE NOT NULL,
+    endDate DATE NOT NULL,
+    totalCost FLOAT NOT NULL,
+    FOREIGN KEY (customerID) REFERENCES customer(customerID),
+    FOREIGN KEY (carID) REFERENCES car(carID)
+);
 
-)
 
 INSERT INTO car (make, model, year, rentalPricePerDay, availability) VALUES
 ('Toyota', 'Corolla', 2020, 45.99, TRUE),
