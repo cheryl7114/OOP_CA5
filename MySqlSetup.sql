@@ -43,3 +43,18 @@ INSERT INTO car (make, model, year, rentalPricePerDay, availability) VALUES
 ('Audi', 'A4', 2022, 100.00, TRUE),
 ('Tesla', 'Model 3', 2021, 120.00, TRUE),
 ('Hyundai', 'Elantra', 2020, 42.00, TRUE);
+
+
+-- hashing to be done later on
+INSERT INTO customer (customerName, email, phone, password) VALUES
+('John Doe', 'john.doe@gmail.com', '0871234567', 'password1'),
+('Jane Smith', 'jane.smith@yahoo.com', '0872345678', 'password2'),
+('Alice Johnson', 'alice.johnson@outlook.com', '0873456789', 'password3'),
+('Bob Williams', 'bob.williams@gmail.com', '0874567890', 'password4'),
+('Charlie Brown', 'charlie.brown@hotmail.com', '0875678901', 'password5'),
+('David Clark', 'david.clark@yahoo.com', '0876789012', 'password6'),
+('Emma Watson', 'emma.watson@outlook.com', '0877890123', 'password7'),
+('Frank White', 'frank.white@gmail.com', '0878901234', 'password8'),
+('Grace Hall', 'grace.hall@yahoo.com', '0879012345', 'password9'),
+('Hannah King', 'hannah.king@outlook.com', '0879123456', 'password10');
+
