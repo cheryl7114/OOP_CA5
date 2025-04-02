@@ -136,7 +136,7 @@ public class MySqlCarDao extends MySqlDao implements CarDaoInterface {
     }
 
     @Override
-    public Car insertCar(Car car) throws DaoException {
+    public void insertCar(Car car) throws DaoException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet generatedKeys = null;
@@ -145,7 +145,7 @@ public class MySqlCarDao extends MySqlDao implements CarDaoInterface {
             connection = this.getConnection();
 
             String query = "INSERT INTO car (make, model, year, rentalPricePerDay, availability) VALUES (?, ?, ?, ?, ?)";
-            preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement = connection.prepareStatement(query);
 
             preparedStatement.setString(1, car.getMake());
             preparedStatement.setString(2, car.getModel());
@@ -159,22 +159,10 @@ public class MySqlCarDao extends MySqlDao implements CarDaoInterface {
                 throw new DaoException("No car was inserted.");
             }
 
-            generatedKeys = preparedStatement.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                int generatedId = generatedKeys.getInt(1);
-                return new Car(generatedId, car.getMake(), car.getModel(), car.getYear(), car.getRentalPricePerDay(),
-                        car.isAvailable());
-            } else {
-                throw new DaoException("Failed to retrieve generated carID.");
-            }
-
         } catch (SQLException e) {
             throw new DaoException("insertCar() " + e.getMessage());
         } finally {
             try {
-                if (generatedKeys != null) {
-                    generatedKeys.close();
-                }
                 if (preparedStatement != null) {
                     preparedStatement.close();
                 }
