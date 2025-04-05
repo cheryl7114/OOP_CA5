@@ -11,6 +11,7 @@ module org.example.oop_ca5 {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
     requires java.sql;
+    requires org.json;
 
     opens org.example.oop_ca5 to javafx.fxml;
     exports org.example.oop_ca5;
