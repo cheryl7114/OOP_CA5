@@ -136,10 +136,10 @@ public class Main {
         System.out.print("Is the car available? (true/false): ");
         boolean availability = scanner.nextBoolean();
 
-        Car newCar = new Car(0, make, model, year, rentalPrice, availability);
         try {
-            Car insertedCar = carDao.insertCar(newCar);
-            System.out.println("Inserted Car: " + insertedCar);
+            Car newCar = new Car(0, make, model, year, rentalPrice, availability);
+            carDao.insertCar(newCar);
+            System.out.println("Car inserted successfully!");
         } catch (DaoException e) {
             System.err.println("Error inserting car: " + e.getMessage());
         }

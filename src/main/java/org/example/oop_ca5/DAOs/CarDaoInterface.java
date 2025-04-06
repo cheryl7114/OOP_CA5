@@ -8,7 +8,7 @@ public interface CarDaoInterface {
     List<Car> loadAllCars() throws DaoException;
     Car findCarById(int carID) throws DaoException;
     void deleteCarById(int carID) throws DaoException;
-    Car insertCar(Car car) throws DaoException;
+    void insertCar(Car car) throws DaoException;
     Car updateCar(Car car) throws DaoException;
     List<Car> getAvailableCars() throws DaoException;
 }
