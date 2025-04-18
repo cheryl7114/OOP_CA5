@@ -109,4 +109,30 @@ class MySqlCarDaoTest {
         // cleanup
         carDao.deleteCarById(insertedCar.getCarId());
     }
+
+    @Test
+    void testUpdateCar() throws DaoException {
+        // get an existing car
+        Car car = carDao.findCarById(1);
+        String originalMake = car.getMake();
+        float originalPrice = car.getRentalPricePerDay();
+
+        // update make and rental price
+        car.setMake("UpdatedMake");
+        car.setRentalPricePerDay(originalPrice + 10);
+        Car updatedCar = carDao.updateCar(car);
+
+        // verify update
+        assertEquals("UpdatedMake", updatedCar.getMake());
+        assertEquals(originalPrice + 10, updatedCar.getRentalPricePerDay());
+
+        // verify changes in DB
+        Car dbCar = carDao.findCarById(1);
+        assertEquals("UpdatedMake", dbCar.getMake());
+
+        // Restore original values
+        car.setMake(originalMake);
+        car.setRentalPricePerDay(originalPrice);
+        carDao.updateCar(car);
+    }
 }
