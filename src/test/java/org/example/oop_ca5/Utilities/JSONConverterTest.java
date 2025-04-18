@@ -80,4 +80,13 @@ class JSONConverterTest {
         assertEquals(3, thirdCar.getInt("carID"));
         assertEquals("Ford", thirdCar.getString("make"));
     }
+
+    @Test
+    void testCarListToJSONStringWithEmptyList() throws DaoException {
+        List<Car> emptyList = new ArrayList<>();
+        String jsonString = JSONConverter.carListToJSONString(emptyList);
+
+        JSONArray jsonArray = new JSONArray(jsonString);
+        assertEquals(0, jsonArray.length());
+    }
 }
