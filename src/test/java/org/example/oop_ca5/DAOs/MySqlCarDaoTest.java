@@ -44,5 +44,11 @@ class MySqlCarDaoTest {
         assertTrue(car.getRentalPricePerDay() > 0);
     }
 
-
+    @Test
+    void testFindCarByIdNotFound() {
+        // test if finding a car that doesn't exist throws a DaoException
+        assertThrows(DaoException.class, () -> {
+            carDao.findCarById(9999);
+        });
+    }
 }
