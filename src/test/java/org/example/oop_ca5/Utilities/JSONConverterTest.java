@@ -89,4 +89,24 @@ class JSONConverterTest {
         JSONArray jsonArray = new JSONArray(jsonString);
         assertEquals(0, jsonArray.length());
     }
+
+    @Test
+    void testNullToJSONString() {
+        Exception exception = assertThrows(DaoException.class, () -> {
+            // Passing null instead of a car object
+            JSONConverter.carObjectToJSONString(null);
+        });
+
+        assertTrue(exception.getMessage().contains("Error converting car to JSON"));
+    }
+
+    @Test
+    void testNullListToJSONString() {
+        Exception exception = assertThrows(DaoException.class, () -> {
+            // Passing null instead of a car list
+            JSONConverter.carListToJSONString(null);
+        });
+
+        assertTrue(exception.getMessage().contains("Error converting car list to JSON"));
+    }
 }
