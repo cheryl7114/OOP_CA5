@@ -139,7 +139,6 @@ public class MySqlCarDao extends MySqlDao implements CarDaoInterface {
     public void insertCar(Car car) throws DaoException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
-        ResultSet generatedKeys = null;
 
         try {
             connection = this.getConnection();
