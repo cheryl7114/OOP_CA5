@@ -67,4 +67,12 @@ class MySqlCarDaoTest {
             carDao.findCarById(insertedCar.getCarId());
         });
     }
+
+    @Test
+    void testDeleteCarByIdNotFound() {
+        // test if deleting a car that doesn't exist throws a DaoException
+        assertThrows(DaoException.class, () -> {
+            carDao.deleteCarById(999);
+        });
+    }
 }
