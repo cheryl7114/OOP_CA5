@@ -1,4 +1,5 @@
 module org.example.oop_ca5 {
+    requires org.json;
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.web;
