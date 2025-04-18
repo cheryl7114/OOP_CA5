@@ -48,7 +48,7 @@ class MySqlCarDaoTest {
     void testFindCarByIdNotFound() {
         // test if finding a car that doesn't exist throws a DaoException
         assertThrows(DaoException.class, () -> {
-            carDao.findCarById(9999);
+            carDao.findCarById(999);
         });
     }
 
@@ -134,5 +134,35 @@ class MySqlCarDaoTest {
         car.setMake(originalMake);
         car.setRentalPricePerDay(originalPrice);
         carDao.updateCar(car);
+    }
+
+    @Test
+    void testUpdateCarNotFound() {
+        Car testCar = new Car(999, "NoCar", "NoModel", 2023, 5, true);
+
+        assertThrows(DaoException.class, () -> {
+            carDao.updateCar(testCar);
+        });
+    }
+
+    @Test
+    void testGetAvailableCars() throws DaoException {
+        List<Car> availableCars = carDao.getAvailableCars();
+
+        assertNotNull(availableCars);
+
+        // if availableCars List is empty, verify if all cars are really unavailable
+        if (availableCars.isEmpty()) {
+            List<Car> allCars = carDao.loadAllCars();
+            for (Car car : allCars) {
+                // car.isAvailable should be false
+                assertFalse(car.isAvailable());
+            }
+        } else {
+            for (Car car : availableCars) {
+                // verify if the cars in the list are available
+                assertTrue(car.isAvailable());
+            }
+        }
     }
 }
