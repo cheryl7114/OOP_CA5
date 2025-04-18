@@ -55,16 +55,26 @@ class MySqlCarDaoTest {
     @Test
     void testDeleteCarById() throws DaoException {
         // insert a test car
-        Car testCar = new Car(0, "TestMake", "TestModel", 2023, 50.0f, true);
+        Car testCar = new Car(0, "TestMake", "TestModel", 2023, 50, true);
         carDao.insertCar(testCar);
 
-        // find and delete the car
-        Car insertedCar = carDao.findCarById(1);
-        carDao.deleteCarById(insertedCar.getCarId());
+        // find the inserted car
+        List<Car> cars = carDao.loadAllCars();
+        Car insertedCar = null;
+        for (Car car : cars) {
+            if ("TestMake".equals(car.getMake()) && "TestModel".equals(car.getModel())) {
+                insertedCar = car;
+                break;
+            }
+        }
+        assertNotNull(insertedCar);
+        // delete the car
+        int carIdToDelete = insertedCar.getCarId();
+        carDao.deleteCarById(carIdToDelete);
 
         // verify deletion
         assertThrows(DaoException.class, () -> {
-            carDao.findCarById(insertedCar.getCarId());
+            carDao.findCarById(carIdToDelete);
         });
     }
 
@@ -74,5 +84,29 @@ class MySqlCarDaoTest {
         assertThrows(DaoException.class, () -> {
             carDao.deleteCarById(999);
         });
+    }
+
+    @Test
+    void testInsertCar() throws DaoException {
+        // insert test car
+        Car testCar = new Car(0, "TestMake", "TestModel", 2023, 75, true);
+        carDao.insertCar(testCar);
+
+        // find the inserted car
+        List<Car> allCars = carDao.loadAllCars();
+        Car insertedCar = null;
+        for (Car car : allCars) {
+            if ("TestMake".equals(car.getMake()) && "TestModel".equals(car.getModel())) {
+                insertedCar = car;
+                break;
+            }
+        }
+        // verify
+        assertNotNull(insertedCar);
+        assertEquals(2023, insertedCar.getYear());
+        assertEquals(75, insertedCar.getRentalPricePerDay());
+
+        // cleanup
+        carDao.deleteCarById(insertedCar.getCarId());
     }
 }
