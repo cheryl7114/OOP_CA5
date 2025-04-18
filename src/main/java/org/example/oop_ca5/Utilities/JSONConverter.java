@@ -37,7 +37,7 @@ public class JSONConverter {
     } 
 
     // method to convert car object to json object
-    private static JSONObject carToJSONObject(Car car) {
+    public static JSONObject carToJSONObject(Car car) {
         JSONObject carJson = new JSONObject();
         carJson.put("carID", car.getCarId());
         carJson.put("make", car.getMake());
