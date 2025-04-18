@@ -47,9 +47,11 @@ class MySqlCarDaoTest {
     @Test
     void testFindCarByIdNotFound() {
         // test if finding a car that doesn't exist throws a DaoException
-        assertThrows(DaoException.class, () -> {
+        Exception exception = assertThrows(DaoException.class, () -> {
             carDao.findCarById(999);
         });
+
+        assertTrue(exception.getMessage().contains("No car found with ID: "));
     }
 
     @Test
@@ -73,17 +75,20 @@ class MySqlCarDaoTest {
         carDao.deleteCarById(carIdToDelete);
 
         // verify deletion
-        assertThrows(DaoException.class, () -> {
+        Exception exception = assertThrows(DaoException.class, () -> {
             carDao.findCarById(carIdToDelete);
         });
+        assertTrue(exception.getMessage().contains("No car found with ID: "));
     }
 
     @Test
     void testDeleteCarByIdNotFound() {
         // test if deleting a car that doesn't exist throws a DaoException
-        assertThrows(DaoException.class, () -> {
+        Exception exception = assertThrows(DaoException.class, () -> {
             carDao.deleteCarById(999);
         });
+
+        assertTrue(exception.getMessage().contains("No car found with ID: "));
     }
 
     @Test
@@ -140,9 +145,11 @@ class MySqlCarDaoTest {
     void testUpdateCarNotFound() {
         Car testCar = new Car(999, "NoCar", "NoModel", 2023, 5, true);
 
-        assertThrows(DaoException.class, () -> {
+        Exception exception = assertThrows(DaoException.class, () -> {
             carDao.updateCar(testCar);
         });
+
+        assertTrue(exception.getMessage().contains("No car found with ID: "));
     }
 
     @Test
