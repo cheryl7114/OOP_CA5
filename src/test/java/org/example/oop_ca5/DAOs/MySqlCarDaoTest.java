@@ -51,4 +51,20 @@ class MySqlCarDaoTest {
             carDao.findCarById(9999);
         });
     }
+
+    @Test
+    void testDeleteCarById() throws DaoException {
+        // insert a test car
+        Car testCar = new Car(0, "TestMake", "TestModel", 2023, 50.0f, true);
+        carDao.insertCar(testCar);
+
+        // find and delete the car
+        Car insertedCar = carDao.findCarById(1);
+        carDao.deleteCarById(insertedCar.getCarId());
+
+        // verify deletion
+        assertThrows(DaoException.class, () -> {
+            carDao.findCarById(insertedCar.getCarId());
+        });
+    }
 }
