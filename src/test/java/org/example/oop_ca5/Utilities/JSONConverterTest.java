@@ -21,7 +21,6 @@ class JSONConverterTest {
     void setUp() {
         // Create a test car
         testCar = new Car(1, "Toyota", "Corolla", 2020, 50, true);
-
         // Create a list of test cars
         testCarList = new ArrayList<>();
         testCarList.add(testCar);
@@ -37,7 +36,7 @@ class JSONConverterTest {
         assertEquals("Toyota", jsonObject.getString("make"));
         assertEquals("Corolla", jsonObject.getString("model"));
         assertEquals(2020, jsonObject.getInt("year"));
-        assertEquals(50.0, jsonObject.getDouble("rentalPricePerDay"));
+        assertEquals(50, jsonObject.getDouble("rentalPricePerDay"));
         assertTrue(jsonObject.getBoolean("availability"));
     }
 
@@ -52,7 +51,33 @@ class JSONConverterTest {
         assertEquals("Toyota", jsonObject.getString("make"));
         assertEquals("Corolla", jsonObject.getString("model"));
         assertEquals(2020, jsonObject.getInt("year"));
-        assertEquals(50.0, jsonObject.getDouble("rentalPricePerDay"));
+        assertEquals(50, jsonObject.getDouble("rentalPricePerDay"));
         assertTrue(jsonObject.getBoolean("availability"));
+    }
+
+    @Test
+    void testCarListToJSONString() throws DaoException {
+        String jsonString = JSONConverter.carListToJSONString(testCarList);
+
+        // Parse the string back to a JSONArray to verify contents
+        JSONArray jsonArray = new JSONArray(jsonString);
+
+        assertEquals(3, jsonArray.length());
+
+        // Verify first car
+        JSONObject firstCar = jsonArray.getJSONObject(0);
+        assertEquals(1, firstCar.getInt("carID"));
+        assertEquals("Toyota", firstCar.getString("make"));
+
+        // Verify second car
+        JSONObject secondCar = jsonArray.getJSONObject(1);
+        assertEquals(2, secondCar.getInt("carID"));
+        assertEquals("Honda", secondCar.getString("make"));
+        assertEquals(false, secondCar.getBoolean("availability"));
+
+        // Verify third car
+        JSONObject thirdCar = jsonArray.getJSONObject(2);
+        assertEquals(3, thirdCar.getInt("carID"));
+        assertEquals("Ford", thirdCar.getString("make"));
     }
 }
