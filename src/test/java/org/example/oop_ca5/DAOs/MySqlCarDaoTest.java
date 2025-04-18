@@ -18,6 +18,21 @@ class MySqlCarDaoTest {
     }
 
     @Test
+    void testLoadAllCars() throws DaoException {
+        List<Car> cars = carDao.loadAllCars();
+        assertNotNull(cars);
+        assertFalse(cars.isEmpty());
+        // Check that each car has valid data
+        for (Car car : cars) {
+            assertTrue(car.getCarId() > 0);
+            assertNotNull(car.getMake());
+            assertNotNull(car.getModel());
+            assertTrue(car.getYear() > 1900 && car.getYear() <= 2025);
+            assertTrue(car.getRentalPricePerDay() > 0);
+        }
+    }
+
+    @Test
     void testFindCarById() throws DaoException {
         // find car with id 1
         Car car = carDao.findCarById(1);
@@ -28,4 +43,6 @@ class MySqlCarDaoTest {
         assertTrue(car.getYear() > 0);
         assertTrue(car.getRentalPricePerDay() > 0);
     }
+
+
 }
