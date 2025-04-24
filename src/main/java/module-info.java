@@ -17,4 +17,5 @@ module org.example.oop_ca5 {
     opens org.example.oop_ca5.DTOs to javafx.base;
     exports org.example.oop_ca5;
     exports org.example.oop_ca5.GUI;
+    opens org.example.oop_ca5 to javafx.fxml;
 }
