@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<!--A StackPane is a layout that stacks its children on top of each other. Only one child (or a few) might be visible at a time, depending on your app logic-->
+<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="org.example.oop_ca5.GUI.HelloController"
+           style="-fx-background-color: white;">
+
+    <!-- Main Menu Pane -->
+    <VBox fx:id="mainMenuPane" spacing="20" alignment="CENTER" style="-fx-padding: 20;">
+        <Text text="Car Rental System" style="-fx-font-size: 24; -fx-font-weight: bold;"/>
+
+        <Button text="Find Car by ID" style="-fx-min-width: 200; -fx-min-height: 40;" onAction="#handleFindCarById"/>
+
+        <Button text="Display All Cars" style="-fx-min-width: 200; -fx-min-height: 40;" onAction="#handleDisplayAllCars"/>
+
+        <Button text="Exit" style="-fx-min-width: 200; -fx-min-height: 40;" onAction="#handleExit"/>
+    </VBox>
+
+    <!-- Car Details Pane (Initially hidden) -->
+    <VBox fx:id="carDetailsPane" spacing="20" alignment="CENTER" style="-fx-padding: 20;" visible="false">
+        <Text text="Car Details" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
+
+        <GridPane fx:id="carDetailsGrid" hgap="10" vgap="10" alignment="CENTER">
+            <Label text="ID:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <Label fx:id="idLabel" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+            <Label text="Make:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+            <Label fx:id="makeLabel" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+            <Label text="Model:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+            <Label fx:id="modelLabel" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+            <Label text="Year:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+            <Label fx:id="yearLabel" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+            <Label text="Price/Day:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+            <Label fx:id="priceLabel" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+            <Label text="Available:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+            <Label fx:id="availableLabel" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+        </GridPane>
+
+        <Button text="Back to Menu" onAction="#handleBackToMenu" style="-fx-min-width: 150;"/>
+    </VBox>
+
+    <!-- All Cars Pane (Initially hidden) -->
+    <VBox fx:id="allCarsPane" spacing="20" alignment="CENTER" style="-fx-padding: 20;" visible="false">
+        <Text text="All Cars" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
+
+        <TableView fx:id="carsTableView">
+            <columns>
+                <TableColumn fx:id="idColumn" text="ID" />
+                <TableColumn fx:id="makeColumn" text="Make" />
+                <TableColumn fx:id="modelColumn" text="Model" />
+                <TableColumn fx:id="yearColumn" text="Year" />
+                <TableColumn fx:id="priceColumn" text="Price/Day" />
+                <TableColumn fx:id="availableColumn" text="Available" />
+            </columns>
+        </TableView>
+
+        <Button text="Back to Menu" onAction="#handleBackToMenu" style="-fx-min-width: 150;"/>
+    </VBox>
+</StackPane>

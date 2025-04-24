@@ -13,6 +13,7 @@ module org.example.oop_ca5 {
     requires com.almasb.fxgl.all;
     requires java.sql;
 
-    opens org.example.oop_ca5 to javafx.fxml;
+    opens org.example.oop_ca5.GUI to javafx.fxml;
+    opens org.example.oop_ca5.DTOs to javafx.base;
     exports org.example.oop_ca5;
 }
