@@ -43,6 +43,9 @@ public class Server {
                     handleGetImagesList(dataOutputStream);
                 } else if ("GET_IMAGE".equals(command)) {
                     handleGetImage(dataInputStream, dataOutputStream);
+                // Feature 14
+                } else if (command.equals("EXIT")) {
+                    break;
                 } else {
                     System.out.println("Invalid command!");
                 }

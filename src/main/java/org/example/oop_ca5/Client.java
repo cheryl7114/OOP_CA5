@@ -18,32 +18,58 @@ public class Client {
     public void start() {
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.println("1. Find Car by ID");
-            System.out.println("2. Display All Cars");
-            System.out.println("3. View available images");
-            System.out.println("4. Exit");
-            int choice = scanner.nextInt();
+            printMenu();
+            if (scanner.hasNextInt()) {
+                int choice = scanner.nextInt();
+                // exit client menu and notify server
+                if (choice == 5) {
+                    System.out.println("Exiting...");
 
-            try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT);
-                    DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
-                    DataInputStream dis = new DataInputStream(socket.getInputStream())) {
-
-                if (choice == 1) {
-                    handleFindCar(scanner, dos, dis);
-                } else if (choice == 2) {
-                    handleGetAllCars(dos, dis);
-                } else if (choice == 3) {
-                    handleGetImagesList(dos, dis, scanner);
-                } else if (choice == 4) {
+                    try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT);
+                            DataOutputStream dos = new DataOutputStream(socket.getOutputStream())) {
+                        dos.writeUTF("EXIT");
+                        dos.flush();
+                    } catch (IOException e) {
+                        System.out.println("Couldn't notify server of exit: " + e.getMessage());
+                    }
                     break;
-                } else {
-                    System.out.println("Invalid choice! Enter a number 1-4");
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+                try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT);
+                        DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+                        DataInputStream dis = new DataInputStream(socket.getInputStream())) {
+
+                    if (choice == 1) {
+                        handleFindCar(scanner, dos, dis);
+                    } else if (choice == 2) {
+                        handleGetAllCars(dos, dis);
+                    } else if (choice == 3) {
+                        handleGetImagesList(dos, dis, scanner);
+                    } else if (choice == 4) {
+                        handleDownloadAllImages(dos, dis);
+                    } else {
+                        System.out.println("Invalid choice! Enter a number 1-5");
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                System.out.println("Invalid input! Please enter a number.");
+                scanner.next(); // Clear the invalid input
             }
         }
         scanner.close();
+    }
+
+    private void printMenu() {
+        System.out.println("====== Car System Menu ======");
+        System.out.println("1. Find Car by ID");
+        System.out.println("2. Display All Cars");
+        System.out.println("3. View available images");
+        System.out.println("4. Download all images");
+        System.out.println("5. Exit");
+        System.out.println("=============================");
+        System.out.print("Enter your choice: ");
     }
 
     private void handleFindCar(Scanner scanner, DataOutputStream dos, DataInputStream dis) throws IOException {
@@ -116,15 +142,16 @@ public class Client {
 
             if (choice > 0 && choice <= jsonArray.length()) {
                 String filename = jsonArray.getJSONObject(choice - 1).getString("filename");
-                downloadImage(filename, scanner);
+                downloadImage(filename, false, false);
             }
-            
+
         } catch (Exception e) {
             System.out.println("Error processing images list: " + e.getMessage());
         }
     }
 
-    private void downloadImage(String filename, Scanner scanner) throws IOException {
+    private boolean downloadImage(String filename, boolean skipExisting, boolean showDetailedProgress)
+            throws IOException {
         try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT);
                 DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
                 DataInputStream dis = new DataInputStream(socket.getInputStream())) {
@@ -136,7 +163,7 @@ public class Client {
 
             if (!success) {
                 System.out.println("Error: " + dis.readUTF());
-                return;
+                return false;
             }
 
             // Read file size
@@ -153,9 +180,14 @@ public class Client {
 
             // Check if the file already exists
             if (outputFile.exists()) {
-                System.out.println("\nFile already exists: " + outputFile.getAbsolutePath());
-                System.out.println("Download cancelled.");
-                return;
+                if (skipExisting) {
+                    System.out.println("- File already exists, skipping");
+                    return false;
+                } else {
+                    System.out.println("\nFile already exists: " + outputFile.getAbsolutePath());
+                    System.out.println("Download cancelled.");
+                    return false;
+                }
             }
 
             // Download the file
@@ -166,7 +198,7 @@ public class Client {
                 int bytesRead;
                 long totalBytesRead = 0;
 
-                System.out.println("\nDownloading image...");
+                System.out.println(showDetailedProgress ? "- Downloading..." : "\nDownloading image...");
 
                 // Simple progress indicator
                 int progressPercentage = 0;
@@ -182,12 +214,83 @@ public class Client {
                     int newProgressPercentage = (int) ((totalBytesRead * 100) / fileSize);
                     if (newProgressPercentage > progressPercentage) {
                         progressPercentage = newProgressPercentage;
-                        System.out.print("\rProgress: " + progressPercentage + "%");
+                        String progressLabel = showDetailedProgress ? "- Progress: " : "Progress: ";
+                        System.out.print("\r" + progressLabel + progressPercentage + "%");
                     }
                 }
 
-                System.out.println("\nDownload complete! Saved to " + outputFile.getAbsolutePath());
+                if (showDetailedProgress) {
+                    System.out.println("\n- Download complete");
+                } else {
+                    System.out.println("\nDownload complete! Saved to " + outputFile.getAbsolutePath());
+                }
+                return true;
             }
+        }
+    }
+
+    private void handleDownloadAllImages(DataOutputStream dos, DataInputStream dis) throws IOException {
+        dos.writeUTF("GET_IMAGES_LIST");
+        String jsonResponse = dis.readUTF();
+
+        try {
+            JSONArray jsonArray = new JSONArray(jsonResponse);
+
+            if (jsonArray.length() == 0) {
+                System.out.println("No images available for download");
+                return;
+            }
+
+            System.out.println("\nPreparing to download " + jsonArray.length() + " images...");
+
+            // Create downloads directory
+            File downloadsDir = new File("downloads");
+            if (!downloadsDir.exists()) {
+                downloadsDir.mkdir();
+            }
+
+            int successCount = 0;
+            int skipCount = 0;
+            int failCount = 0;
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject img = jsonArray.getJSONObject(i);
+                String filename = img.getString("filename");
+                String imageName = img.getString("name");
+
+                System.out.printf("\nProcessing %d/%d: %s (%s)\n",
+                        i + 1, jsonArray.length(), imageName, filename);
+
+                // Check if file already exists
+                File outputFile = new File("downloads/" + filename);
+                if (outputFile.exists()) {
+                    System.out.println("- File already exists, skipping");
+                    skipCount++;
+                }
+
+                try {
+                    boolean downloadSuccess = downloadImage(filename, true, true); 
+                    if (downloadSuccess) {
+                        successCount++;
+                    } else {
+                        failCount++;
+                    }
+                } catch (Exception e) {
+                    System.out.println("- Error downloading: " + e.getMessage());
+                    failCount++;
+                }
+            }
+
+            // Display summary
+            System.out.println("\n===== Download Summary =====");
+            System.out.println("Total images: " + jsonArray.length());
+            System.out.println("Successfully downloaded: " + successCount);
+            System.out.println("Skipped (already exists): " + skipCount);
+            System.out.println("Failed: " + failCount);
+            System.out.println("============================");
+            System.out.println("All files saved to: " + downloadsDir.getAbsolutePath());
+        } catch (Exception e) {
+            System.out.println("Error processing images list: " + e.getMessage());
         }
     }
 }
