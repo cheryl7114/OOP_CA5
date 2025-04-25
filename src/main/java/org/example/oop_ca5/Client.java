@@ -116,7 +116,7 @@ public class Client {
 
             if (choice > 0 && choice <= jsonArray.length()) {
                 String filename = jsonArray.getJSONObject(choice - 1).getString("filename");
-                downloadImage(filename);
+                downloadImage(filename, scanner);
             }
             
         } catch (Exception e) {
@@ -124,7 +124,7 @@ public class Client {
         }
     }
 
-    private void downloadImage(String filename) throws IOException {
+    private void downloadImage(String filename, Scanner scanner) throws IOException {
         try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT);
                 DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
                 DataInputStream dis = new DataInputStream(socket.getInputStream())) {
@@ -150,6 +150,13 @@ public class Client {
 
             // Create the output file
             File outputFile = new File("downloads/" + filename);
+
+            // Check if the file already exists
+            if (outputFile.exists()) {
+                System.out.println("\nFile already exists: " + outputFile.getAbsolutePath());
+                System.out.println("Download cancelled.");
+                return;
+            }
 
             // Download the file
             try (FileOutputStream fos = new FileOutputStream(outputFile);
