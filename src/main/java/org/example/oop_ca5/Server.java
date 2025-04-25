@@ -1,6 +1,7 @@
 package org.example.oop_ca5;
 
 import org.example.oop_ca5.DAOs.MySqlCarDao;
+import org.example.oop_ca5.DAOs.MySqlImageDao;
 import org.example.oop_ca5.DTOs.Car;
 import org.example.oop_ca5.DTOs.ImageMetadata;
 import org.example.oop_ca5.Exceptions.DaoException;
@@ -44,6 +45,10 @@ public class Server {
                     handleGetAllCarsRequest();
                 } else if ("GET_IMAGES_LIST".equals(command)) {
                     handleGetImagesList(dataOutputStream);
+                } else if ("GET_IMAGE".equals(command)) {
+                    handleGetImage(dataInputStream, dataOutputStream);
+                } else {
+                    System.out.println("Invalid command!");
                 }
 
                 clientSocket.close();
@@ -89,8 +94,9 @@ public class Server {
 
     private void handleGetImagesList(DataOutputStream dos) throws IOException {
         try {
-            // read image metadata from database
-            List<ImageMetadata> imagesList = getImagesList();
+            // Read image metadata from database
+            MySqlImageDao imageDao = new MySqlImageDao();
+            List<ImageMetadata> imagesList = imageDao.getAllImages();
             String jsonString = JSONConverter.imageListToJSONString(imagesList);
             // send json string to client
             dos.writeUTF(jsonString);
@@ -100,26 +106,6 @@ public class Server {
             dos.writeUTF(errorJson.toString());
         }
     }
-    
-    private List<ImageMetadata> getImagesList() throws Exception {
-        List<ImageMetadata> imagesList = new ArrayList<>();
-
-        // Read from JSON file
-        String jsonContent = Files.readString(Paths.get("src/main/resources/images.json"));
-        JSONArray jsonArray = new JSONArray(jsonContent);
-
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject img = jsonArray.getJSONObject(i);
-            imagesList.add(new ImageMetadata(
-                    img.getInt("id"),
-                    img.getString("name"),
-                    img.getString("filename"),
-                    img.getInt("carID")));
-        }
-
-        return imagesList;
-    }
-
     // method to handle when client selects an image
     public void handleGetImage(DataInputStream dis, DataOutputStream dos) throws IOException {
         try {
