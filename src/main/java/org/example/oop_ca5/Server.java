@@ -6,14 +6,10 @@ import org.example.oop_ca5.DTOs.Car;
 import org.example.oop_ca5.DTOs.ImageMetadata;
 import org.example.oop_ca5.Exceptions.DaoException;
 import org.example.oop_ca5.Utilities.JSONConverter;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Server {

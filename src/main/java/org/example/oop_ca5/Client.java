@@ -20,8 +20,8 @@ public class Client {
         while (true) {
             System.out.println("1. Find Car by ID");
             System.out.println("2. Display All Cars");
-            System.out.println("View available images");
-            System.out.println("3. Exit");
+            System.out.println("3. View available images");
+            System.out.println("4. Exit");
             int choice = scanner.nextInt();
 
             try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT);
@@ -33,7 +33,7 @@ public class Client {
                 } else if (choice == 2) {
                     handleGetAllCars(dos, dis);
                 } else if (choice == 3) {
-                    handleGetImagesList(dos, dis);
+                    handleGetImagesList(dos, dis, scanner);
                 } else if (choice == 4) {
                     break;
                 } else {
@@ -89,7 +89,7 @@ public class Client {
         }
     }
 
-    private void handleGetImagesList(DataOutputStream dos, DataInputStream dis) throws IOException {
+    private void handleGetImagesList(DataOutputStream dos, DataInputStream dis, Scanner scanner) throws IOException {
         dos.writeUTF("GET_IMAGES_LIST");
 
         String jsonResponse = dis.readUTF();
@@ -108,19 +108,17 @@ public class Client {
                 System.out.printf("%d. %s (Car ID: %d)%n",
                         i + 1,
                         img.getString("name"),
-                        img.getInt("carId"));
+                        img.getInt("carID"));
             }
 
             System.out.print("\nEnter image number to download (0 to cancel): ");
-            Scanner scanner = new Scanner(System.in);
             int choice = scanner.nextInt();
 
             if (choice > 0 && choice <= jsonArray.length()) {
                 String filename = jsonArray.getJSONObject(choice - 1).getString("filename");
                 downloadImage(filename);
             }
-
-            scanner.close();
+            
         } catch (Exception e) {
             System.out.println("Error processing images list: " + e.getMessage());
         }

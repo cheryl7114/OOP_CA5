@@ -24,7 +24,7 @@ public class MySqlImageDao extends MySqlDao {
             rs = stmt.executeQuery(query);
             
             while (rs.next()) {
-                int id = rs.getInt("id");
+                int id = rs.getInt("imageID");
                 String name = rs.getString("name");
                 String filename = rs.getString("filename");
                 int carID = rs.getInt("carID");
