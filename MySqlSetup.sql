@@ -1,7 +1,10 @@
 CREATE DATABASE IF NOT EXISTS CarRental;
 USE CarRental;
 
+DROP TABLE IF EXISTS rental;
+DROP TABLE IF EXISTS image;
 DROP TABLE IF EXISTS car;
+DROP TABLE IF EXISTS customer;
 
 CREATE TABLE car (
     carID INT AUTO_INCREMENT PRIMARY KEY,
@@ -28,6 +31,14 @@ CREATE TABLE rental (
     endDate DATE NOT NULL,
     totalCost FLOAT NOT NULL,
     FOREIGN KEY (customerID) REFERENCES customer(customerID),
+    FOREIGN KEY (carID) REFERENCES car(carID)
+);
+
+CREATE TABLE image (
+    imageID INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    filename VARCHAR(255) NOT NULL,
+    carID INT NOT NULL,
     FOREIGN KEY (carID) REFERENCES car(carID)
 );
 
