@@ -1,7 +1,10 @@
 CREATE DATABASE IF NOT EXISTS CarRental;
 USE CarRental;
 
+DROP TABLE IF EXISTS rental;
+DROP TABLE IF EXISTS image;
 DROP TABLE IF EXISTS car;
+DROP TABLE IF EXISTS customer;
 
 CREATE TABLE car (
     carID INT AUTO_INCREMENT PRIMARY KEY,
@@ -28,6 +31,14 @@ CREATE TABLE rental (
     endDate DATE NOT NULL,
     totalCost FLOAT NOT NULL,
     FOREIGN KEY (customerID) REFERENCES customer(customerID),
+    FOREIGN KEY (carID) REFERENCES car(carID)
+);
+
+CREATE TABLE image (
+    imageID INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    filename VARCHAR(255) NOT NULL,
+    carID INT NOT NULL,
     FOREIGN KEY (carID) REFERENCES car(carID)
 );
 
@@ -67,3 +78,12 @@ INSERT INTO rental (customerID, carID, startDate, endDate, totalCost) VALUES
 (6, 2, '2024-11-10', '2024-11-19', 50.00 * 10),  -- Honda Civic (10 days)
 (7, 7, '2025-02-15', '2025-02-20', 95.00 * 6),   -- Mercedes C-Class (6 days)
 (10, 10, '2024-12-20', '2024-12-24', 42.00 * 5); -- Hyundai Elantra (5 days)
+
+INSERT INTO image (name, filename, carID) VALUES
+('Toyota Corolla', 'toyota_corolla_2020.png', 1),
+('Honda Civic', 'honda_civic_2021.jpg', 2),
+('Ford Focus', 'ford_focus_2019.jpeg', 3),
+('Chevrolet Malibu', 'chevrolet_malibu_2022.jpg', 4),
+('Nissan Altima', 'nissan_altima_2020.png', 5),
+('BMW 3 Series', 'bmw_3_series_2021.jpg', 6),
+('Mercedes C-Class', 'mercedes', 7);
