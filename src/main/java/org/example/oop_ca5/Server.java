@@ -101,6 +101,61 @@ public class Server {
         }
     }
 
+    private void handleInsertCarRequest() {
+        try {
+            String jsonCar = dataInputStream.readUTF();
+            JSONObject json = new JSONObject(jsonCar);
+
+            String make = json.getString("make");
+            String model = json.getString("model");
+            int year = json.getInt("year");
+            float rentalPrice = (float) json.getDouble("rentalPricePerDay");
+            boolean availability = json.getBoolean("availability");
+
+            Car car = new Car(make, model, year, rentalPrice, availability);
+
+            MySqlCarDao carDao = new MySqlCarDao();
+            carDao.insertCar(car); // Updates car’s ID internally
+
+            // Send success response
+            String jsonResponse = JSONConverter.carObjectToJSONString(car);
+            dataOutputStream.writeUTF(jsonResponse);
+
+        } catch (DaoException e) {
+            try {
+                JSONObject error = new JSONObject();
+                error.put("error", "DAO Error: " + e.getMessage());
+                dataOutputStream.writeUTF(error.toString());
+            } catch (IOException ex) {
+                System.err.println("Failed to send error: " + ex.getMessage());
+            }
+        } catch (org.json.JSONException e) {
+            try {
+                JSONObject error = new JSONObject();
+                error.put("error", "Invalid JSON: " + e.getMessage());
+                dataOutputStream.writeUTF(error.toString());
+            } catch (IOException ex) {
+                System.err.println("Failed to send error: " + ex.getMessage());
+            }
+        } catch (IOException e) {
+            try {
+                JSONObject error = new JSONObject();
+                error.put("error", "IO Error: " + e.getMessage());
+                dataOutputStream.writeUTF(error.toString());
+            } catch (IOException ex) {
+                System.err.println("Failed to send error: " + ex.getMessage());
+            }
+        } catch (Exception e) {
+            try {
+                JSONObject error = new JSONObject();
+                error.put("error", "Unexpected error: " + e.getMessage());
+                dataOutputStream.writeUTF(error.toString());
+            } catch (IOException ex) {
+                System.err.println("Failed to send error: " + ex.getMessage());
+            }
+        }
+    }
+
     private void handleGetImagesList(DataOutputStream dos) throws IOException {
         try {
             // Read image metadata from database
