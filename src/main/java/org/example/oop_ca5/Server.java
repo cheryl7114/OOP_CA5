@@ -47,6 +47,8 @@ public class Server {
                 handleFindCarRequest(dataInputStream, dataOutputStream);
             } else if ("GET_ALL_CARS".equals(command)) {
                 handleGetAllCarsRequest(dataOutputStream);
+            } else if ("INSERT_CAR".equals(command)) {
+                handleInsertCarRequest(dataInputStream, dataOutputStream);
             } else if ("GET_IMAGES_LIST".equals(command)) {
                 handleGetImagesList(dataOutputStream);
             } else if ("GET_IMAGE".equals(command)) {
@@ -101,7 +103,7 @@ public class Server {
         }
     }
 
-    private void handleInsertCarRequest() {
+    private void handleInsertCarRequest(DataInputStream dataInputStream, DataOutputStream dataOutputStream) {
         try {
             String jsonCar = dataInputStream.readUTF();
             JSONObject json = new JSONObject(jsonCar);
