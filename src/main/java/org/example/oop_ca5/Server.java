@@ -14,8 +14,6 @@ import java.util.List;
 
 public class Server {
     final static int SERVER_PORT = 1024;
-    private DataInputStream dataInputStream;
-    private DataOutputStream dataOutputStream;
 
     public static void main(String[] args) {
         Server server = new Server();
@@ -25,39 +23,51 @@ public class Server {
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(SERVER_PORT)) {
             System.out.println("Server is Starting on Port " + SERVER_PORT);
-
+    
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("Connected");
-
-                dataInputStream = new DataInputStream(clientSocket.getInputStream());
-                dataOutputStream = new DataOutputStream(clientSocket.getOutputStream());
-
-                String command = dataInputStream.readUTF();
-
-                if ("FIND_CAR_BY_ID".equals(command)) {
-                    handleFindCarRequest();
-                } else if ("GET_ALL_CARS".equals(command)) {
-                    handleGetAllCarsRequest();
-                } else if ("GET_IMAGES_LIST".equals(command)) {
-                    handleGetImagesList(dataOutputStream);
-                } else if ("GET_IMAGE".equals(command)) {
-                    handleGetImage(dataInputStream, dataOutputStream);
-                // Feature 14
-                } else if (command.equals("EXIT")) {
-                    break;
-                } else {
-                    System.out.println("Invalid command!");
-                }
-
-                clientSocket.close();
+                System.out.println("Client connected from: " + clientSocket.getInetAddress());
+    
+                // Create a new thread to handle this client
+                new Thread(() -> handleClient(clientSocket)).start();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+    
+    private void handleClient(Socket clientSocket) {
+        try (
+            DataInputStream dataInputStream = new DataInputStream(clientSocket.getInputStream());
+            DataOutputStream dataOutputStream = new DataOutputStream(clientSocket.getOutputStream())
+        ) {
+            String command = dataInputStream.readUTF();
 
-    private void handleFindCarRequest() throws IOException {
+            if ("FIND_CAR_BY_ID".equals(command)) {
+                handleFindCarRequest(dataInputStream, dataOutputStream);
+            } else if ("GET_ALL_CARS".equals(command)) {
+                handleGetAllCarsRequest(dataOutputStream);
+            } else if ("GET_IMAGES_LIST".equals(command)) {
+                handleGetImagesList(dataOutputStream);
+            } else if ("GET_IMAGE".equals(command)) {
+                handleGetImage(dataInputStream, dataOutputStream);
+            } else if (command.equals("EXIT")) {
+                System.out.println("Client disconnected: " + clientSocket.getInetAddress());
+            } else {
+                System.out.println("Invalid command: " + command);
+            }
+        } catch (Exception e) {
+            System.out.println("Error handling client: " + e.getMessage());
+        } finally {
+            try {
+                clientSocket.close();
+            } catch (IOException e) {
+                System.out.println("Error closing client socket: " + e.getMessage());
+            }
+        }
+    }
+
+    private void handleFindCarRequest(DataInputStream dataInputStream, DataOutputStream dataOutputStream) throws IOException {
         try {
             int carId = dataInputStream.readInt();
             MySqlCarDao carDao = new MySqlCarDao();
@@ -76,7 +86,7 @@ public class Server {
         }
     }
 
-    private void handleGetAllCarsRequest() throws IOException {
+    private void handleGetAllCarsRequest(DataOutputStream dataOutputStream) throws IOException {
         try {
             MySqlCarDao carDao = new MySqlCarDao();
             List<Car> cars = carDao.loadAllCars();
