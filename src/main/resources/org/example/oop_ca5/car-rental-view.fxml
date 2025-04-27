@@ -19,12 +19,18 @@
 
         <Button text="Add New Car" style="-fx-min-width: 200; -fx-min-height: 40;" onAction="#handleShowInsertCar"/>
 
+        <Button text="Display All Rentals" style="-fx-min-width: 200; -fx-min-height: 40;" onAction="#handleDisplayAllRentals"/>
+
+        <Button text="Add New Rental" style="-fx-min-width: 200; -fx-min-height: 40;" onAction="#handleShowInsertRental"/>
+
         <Button text="Delete Car" style="-fx-min-width: 200; -fx-min-height: 40;" onAction="#handleShowDeleteCar"/>
+
+        <Button text="View and Download Images" style="-fx-min-width: 200; -fx-min-height: 40;" onAction="#handleViewDownloadImages"/>
 
         <Button text="Exit" style="-fx-min-width: 200; -fx-min-height: 40;" onAction="#handleExit"/>
     </VBox>
 
-    <!-- Car Details Pane (Initially hidden) -->
+    <!-- Car Details Pane -->
     <VBox fx:id="carDetailsPane" spacing="20" alignment="CENTER" style="-fx-padding: 20;" visible="false">
         <Text text="Car Details" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
 
@@ -51,7 +57,7 @@
         <Button text="Back to Menu" onAction="#handleBackToMenu" style="-fx-min-width: 150;"/>
     </VBox>
 
-    <!-- All Cars Pane (Initially hidden) -->
+    <!-- All Cars Pane -->
     <VBox fx:id="allCarsPane" spacing="20" alignment="CENTER" style="-fx-padding: 20;" visible="false">
         <Text text="All Cars" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
 
@@ -69,6 +75,7 @@
         <Button text="Back to Menu" onAction="#handleBackToMenu" style="-fx-min-width: 150;"/>
     </VBox>
 
+    <!--  Insert Car Pane  -->
     <VBox fx:id="insertCarPane" spacing="20" alignment="CENTER" style="-fx-padding: 20;" visible="false">
         <Text text="Add New Car" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
 
@@ -112,6 +119,65 @@
 
         <HBox spacing="10" alignment="CENTER">
             <Button text="Delete" style="-fx-min-width: 100;" onAction="#handleDeleteCar"/>
+            <Button text="Back" style="-fx-min-width: 100;" onAction="#handleBackToMenu"/>
+        </HBox>
+    </VBox>
+
+    <!-- View and Download Images Pane -->
+    <VBox fx:id="viewDownloadImagesPane" spacing="20" alignment="CENTER" style="-fx-padding: 20;" visible="false">
+        <Text text="Available Images" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
+
+        <TextArea fx:id="imagesListTextArea" editable="false" wrapText="true" style="-fx-min-width: 400; -fx-min-height: 300;"/>
+
+        <HBox spacing="10" alignment="CENTER">
+            <Button text="Download Selected Image" style="-fx-min-width: 150;" onAction="#handleViewDownloadImages"/>
+            <Button text="Download All Images" style="-fx-min-width: 150;" onAction="#handleViewDownloadImages"/>
+        </HBox>
+
+        <Button text="Back to Menu" style="-fx-min-width: 150;" onAction="#handleBackToMenu"/>
+    </VBox>
+
+    <!-- All Rentals Pane -->
+    <VBox fx:id="allRentalsPane" spacing="20" alignment="CENTER" style="-fx-padding: 20;" visible="false">
+        <Text text="All Rentals" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
+
+        <TableView fx:id="rentalsTableView">
+            <columns>
+                <TableColumn fx:id="rentalIdColumn" text="Rental ID" />
+                <TableColumn fx:id="customerIdColumn" text="Customer ID" />
+                <TableColumn fx:id="carIdRentalColumn" text="Car ID" />
+                <TableColumn fx:id="startDateColumn" text="Start Date" />
+                <TableColumn fx:id="endDateColumn" text="End Date" />
+                <TableColumn fx:id="totalCostColumn" text="Total Cost" />
+            </columns>
+        </TableView>
+
+        <Button text="Back to Menu" onAction="#handleBackToMenu" style="-fx-min-width: 150;"/>
+    </VBox>
+
+    <!-- Insert Rental Pane -->
+    <VBox fx:id="insertRentalPane" spacing="20" alignment="CENTER" style="-fx-padding: 20;" visible="false">
+        <Text text="Add New Rental" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
+
+        <GridPane hgap="10" vgap="10" alignment="CENTER">
+            <Label text="Customer ID:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+            <TextField fx:id="customerIdField" GridPane.columnIndex="1" GridPane.rowIndex="0" style="-fx-min-width: 200;"/>
+
+            <Label text="Car:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+            <ComboBox fx:id="carComboBox" GridPane.columnIndex="1" GridPane.rowIndex="1" promptText="Select a car…" style="-fx-min-width: 200;"/>
+
+            <Label text="Total Cost:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+            <TextField fx:id="totalCostField" GridPane.columnIndex="1" GridPane.rowIndex="2" style="-fx-min-width: 200;"/>
+
+            <Label text="Start Date:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+            <DatePicker fx:id="startDatePicker" GridPane.columnIndex="1" GridPane.rowIndex="3" style="-fx-min-width: 200;"/>
+
+            <Label text="End Date:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+            <DatePicker fx:id="endDatePicker" GridPane.columnIndex="1" GridPane.rowIndex="4" style="-fx-min-width: 200;"/>
+        </GridPane>
+
+        <HBox spacing="10" alignment="CENTER">
+            <Button text="Submit" style="-fx-min-width: 100;" onAction="#handleInsertRental"/>
             <Button text="Back" style="-fx-min-width: 100;" onAction="#handleBackToMenu"/>
         </HBox>
     </VBox>
