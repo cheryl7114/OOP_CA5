@@ -22,8 +22,9 @@ public class Client {
             printMenu();
             if (scanner.hasNextInt()) {
                 int choice = scanner.nextInt();
+                scanner.nextLine();
                 // exit client menu and notify server
-                if (choice == 7) {
+                if (choice == 9) {
                     System.out.println("Exiting...");
 
                     try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT);
@@ -49,10 +50,15 @@ public class Client {
                         handleDownloadAllImages(dos, dis);
                     } else if (choice == 5) {
                         handleInsertCar(scanner, dos, dis);
-                    }else if (choice == 6) {
+                    } else if (choice == 6) {
                         handleDeleteCar(scanner, dos, dis);
+                    } else if (choice == 7) {
+                        handleGetAllRentals(dos, dis);
+                    } else if (choice == 8) {
+                        handleInsertRental(scanner, dos, dis);
                     } else {
                         System.out.println("Invalid choice! Enter a number 1-5");
+                        scanner.nextLine();
                     }
 
                 } catch (IOException e) {
@@ -67,14 +73,16 @@ public class Client {
     }
 
     private void printMenu() {
-        System.out.println("====== Car System Menu ======");
+        System.out.println("\n====== Car System Menu ======");
         System.out.println("1. Find Car by ID");
         System.out.println("2. Display All Cars");
         System.out.println("3. View available images");
         System.out.println("4. Download all images");
         System.out.println("5. Add a Car");
         System.out.println("6. Delete Car by ID");
-        System.out.println("7. Exit");
+        System.out.println("7. Display All Rentals");
+        System.out.println("8. Add New Rental");
+        System.out.println("9. Exit");
         System.out.println("=============================");
         System.out.print("Enter your choice: ");
     }
@@ -191,10 +199,10 @@ public class Client {
             }
         } catch (InputMismatchException e) {
             System.out.println("Invalid input! Please enter a number.");
-            scanner.next();
+            scanner.nextLine();
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
-            scanner.next();
+            scanner.nextLine();
         }
     }
 
@@ -374,6 +382,83 @@ public class Client {
             System.out.println("All files saved to: " + downloadsDir.getAbsolutePath());
         } catch (Exception e) {
             System.out.println("Error processing images list: " + e.getMessage());
+        }
+    }
+
+    private void handleGetAllRentals(DataOutputStream dos, DataInputStream dis) throws IOException {
+        dos.writeUTF("GET_ALL_RENTALS");
+        String jsonResponse = dis.readUTF();
+
+        try {
+            JSONArray arr = new JSONArray(jsonResponse);
+            System.out.println("\nAll Rentals:");
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject r = arr.getJSONObject(i);
+                System.out.printf(
+                        "Rental ID: %d | Customer ID: %d | Car ID: %d | Start: %s | End: %s | Cost: €%.2f%n",
+                        r.getInt("rentalID"),
+                        r.getInt("customerID"),
+                        r.getInt("carID"),
+                        r.getString("startDate"),
+                        r.getString("endDate"),
+                        r.getDouble("totalCost")
+                );
+            }
+        } catch (Exception e) {
+            // If server returned an error JSON
+            JSONObject err = new JSONObject(jsonResponse);
+            System.out.println("Error: " + err.optString("error", e.getMessage()));
+        }
+    }
+
+    private void handleInsertRental(Scanner scanner, DataOutputStream dos, DataInputStream dis) throws IOException {
+        scanner.nextLine();
+        System.out.println("\nEnter new rental details:");
+
+        System.out.print("Customer ID: ");
+        int customerID = scanner.nextInt();
+
+        System.out.print("Car ID: ");
+        int carID = scanner.nextInt();
+
+        System.out.print("Start Date (YYYY-MM-DD): ");
+        String startDate = scanner.next();
+
+        System.out.print("End Date (YYYY-MM-DD): ");
+        String endDate = scanner.next();
+
+        System.out.print("Total Cost: ");
+        float totalCost = scanner.nextFloat();
+
+        // Build JSON request
+        JSONObject rentalJson = new JSONObject();
+        rentalJson.put("customerID", customerID);
+        rentalJson.put("carID", carID);
+        rentalJson.put("startDate", startDate);
+        rentalJson.put("endDate", endDate);
+        rentalJson.put("totalCost", totalCost);
+
+        // Send to server
+        dos.writeUTF("INSERT_RENTAL");
+        dos.writeUTF(rentalJson.toString());
+
+        // Read response
+        String resp = dis.readUTF();
+        JSONObject jr = new JSONObject(resp);
+        if (jr.has("error")) {
+            System.out.println("Error: " + jr.getString("error"));
+        } else {
+            System.out.println("\nRental added successfully:");
+            // server returns the created rental as JSON
+            System.out.printf(
+                    "Rental ID: %d | Customer ID: %d | Car ID: %d | Start: %s | End: %s | Cost: €%.2f%n",
+                    jr.getInt("rentalID"),
+                    jr.getInt("customerID"),
+                    jr.getInt("carID"),
+                    jr.getString("startDate"),
+                    jr.getString("endDate"),
+                    jr.getDouble("totalCost")
+            );
         }
     }
 }
