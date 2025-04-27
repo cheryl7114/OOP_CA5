@@ -19,6 +19,10 @@
 
         <Button text="Add New Car" style="-fx-min-width: 200; -fx-min-height: 40;" onAction="#handleShowInsertCar"/>
 
+        <Button text="Display All Rentals" style="-fx-min-width: 200; -fx-min-height: 40;" onAction="#handleDisplayAllRentals"/>
+
+        <Button text="Add New Rental" style="-fx-min-width: 200; -fx-min-height: 40;" onAction="#handleShowInsertRental"/>
+
         <Button text="Delete Car" style="-fx-min-width: 200; -fx-min-height: 40;" onAction="#handleShowDeleteCar"/>
 
         <Button text="View and Download Images" style="-fx-min-width: 200; -fx-min-height: 40;" onAction="#handleViewDownloadImages"/>

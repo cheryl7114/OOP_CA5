@@ -7,11 +7,13 @@ import javafx.scene.layout.VBox;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.example.oop_ca5.DTOs.Car;
+import org.example.oop_ca5.DTOs.Rental;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.net.Socket;
+import java.time.LocalDate;
 import java.util.Optional;
 
 public class HelloController {
@@ -20,77 +22,52 @@ public class HelloController {
     final static String SERVER_HOST = "localhost";
 
     // Main panes
-    @FXML
-    private VBox mainMenuPane;
-
-    @FXML
-    private VBox carDetailsPane;
-
-    @FXML
-    private VBox allCarsPane;
+    @FXML private VBox mainMenuPane;
+    @FXML private VBox carDetailsPane;
+    @FXML private VBox allCarsPane;
+    @FXML private VBox allRentalsPane;
+    @FXML private VBox insertCarPane;
+    @FXML private VBox deleteCarPane;
+    @FXML private VBox insertRentalPane;
 
     // Car details labels
-    @FXML
-    private Label idLabel;
-
-    @FXML
-    private Label makeLabel;
-
-    @FXML
-    private Label modelLabel;
-
-    @FXML
-    private Label yearLabel;
-
-    @FXML
-    private Label priceLabel;
-
-    @FXML
-    private Label availableLabel;
+    @FXML private Label idLabel, makeLabel, modelLabel, yearLabel, priceLabel, availableLabel;
 
     // Table for all cars
-    @FXML
-    private TableView<Car> carsTableView;
+    @FXML private TableView<Car> carsTableView;
+    @FXML private TableColumn<Car,Integer> idColumn;
+    @FXML private TableColumn<Car,String> makeColumn;
+    @FXML private TableColumn<Car,String> modelColumn;
+    @FXML private TableColumn<Car,Integer> yearColumn;
+    @FXML private TableColumn<Car,Float> priceColumn;
+    @FXML private TableColumn<Car,Boolean> availableColumn;
 
-    @FXML
-    private TableColumn<Car, Integer> idColumn;
+    // Table for all rentals
+    @FXML private TableView<Rental> rentalsTableView;
+    @FXML private TableColumn<Rental,Integer> rentalIdColumn;
+    @FXML private TableColumn<Rental,Integer> customerIdColumn;
+    @FXML private TableColumn<Rental,Integer> carIdRentalColumn;
+    @FXML private TableColumn<Rental,String> startDateColumn;
+    @FXML private TableColumn<Rental,String> endDateColumn;
+    @FXML private TableColumn<Rental,Float> totalCostColumn;
 
-    @FXML
-    private TableColumn<Car, String> makeColumn;
+    // Insert Rental fields
+    @FXML private TextField customerIdField, carIdField, totalCostField;
+    @FXML private DatePicker startDatePicker, endDatePicker;
 
-    @FXML
-    private TableColumn<Car, String> modelColumn;
-
-    @FXML
-    private TableColumn<Car, Integer> yearColumn;
-
-    @FXML
-    private TableColumn<Car, Float> priceColumn;
-
-    @FXML
-    private TableColumn<Car, Boolean> availableColumn;
-
-    //Fields for insert car
-    @FXML private VBox insertCarPane;
-
+    // Insert Car fields
     @FXML private TextField makeField;
-
     @FXML private TextField modelField;
-
     @FXML private TextField yearField;
-
     @FXML private TextField priceField;
-
     @FXML private ComboBox<String> availableComboBox;
 
-    //Delete Car
-    @FXML private VBox deleteCarPane;
-
+    // Delete Car Fields
     @FXML private TextField deleteIdField;
 
     @FXML
     public void initialize() {
-        // Initialize TableView columns using the DTO Car class
+        // Initialize TableView columns for Car using the DTO Car class
         idColumn.setCellValueFactory(new PropertyValueFactory<>("carId"));
         makeColumn.setCellValueFactory(new PropertyValueFactory<>("make"));
         modelColumn.setCellValueFactory(new PropertyValueFactory<>("model"));
@@ -126,6 +103,27 @@ public class HelloController {
 
         availableComboBox.setItems(FXCollections.observableArrayList("Yes", "No"));
         availableComboBox.getSelectionModel().selectFirst();
+
+        // Initialize TableView columns for Rental using the DTO Rental class
+        rentalIdColumn.setCellValueFactory(new PropertyValueFactory<>("rentalID"));
+        customerIdColumn.setCellValueFactory(new PropertyValueFactory<>("customerID"));
+        carIdRentalColumn.setCellValueFactory(new PropertyValueFactory<>("carID"));
+        startDateColumn.setCellValueFactory(new PropertyValueFactory<>("startDate"));
+        endDateColumn.setCellValueFactory(new PropertyValueFactory<>("endDate"));
+        totalCostColumn.setCellValueFactory(new PropertyValueFactory<>("totalCost"));
+
+        // Formatter for totalCost column to show currency
+        totalCostColumn.setCellFactory(column -> new TableCell<Rental, Float>() {
+            @Override
+            protected void updateItem(Float item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(String.format("€%.2f", item));
+                }
+            }
+        });
     }
 
     @FXML
@@ -264,6 +262,8 @@ public class HelloController {
         insertCarPane.setVisible(false);
         deleteCarPane.setVisible(false);
         allCarsPane.setVisible(false);
+        allRentalsPane.setVisible(false);
+        insertRentalPane.setVisible(false);
 
         // Show requested pane
         paneToShow.setVisible(true);
@@ -546,6 +546,108 @@ public class HelloController {
         } catch (IOException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    @FXML
+    protected void handleDisplayAllRentals() {
+        try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT);
+             DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+             DataInputStream dis = new DataInputStream(socket.getInputStream())) {
+
+            dos.writeUTF("GET_ALL_RENTALS");
+            String jsonResponse = dis.readUTF();
+
+            JSONArray jsonArray = new JSONArray(jsonResponse);
+            ObservableList<Rental> rentalsList = FXCollections.observableArrayList();
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject o = jsonArray.getJSONObject(i);
+                Rental rental = new Rental(
+                        o.getInt("rentalID"),
+                        o.getInt("customerID"),
+                        o.getInt("carID"),
+                        LocalDate.parse(o.getString("startDate")),
+                        LocalDate.parse(o.getString("endDate")),
+                        (float)o.getDouble("totalCost")
+                );
+                rentalsList.add(rental);
+            }
+
+            rentalsTableView.setItems(rentalsList);
+            showPane(allRentalsPane);
+
+        } catch (IOException e) {
+            showAlert("Connection Error", "Failed to connect to server: " + e.getMessage(), Alert.AlertType.ERROR);
+        } catch (Exception e) {
+            showAlert("Error", "Failed to load rentals: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    private void clearInsertRentalFields() {
+        customerIdField.clear();
+        carIdField.clear();
+        totalCostField.clear();
+        startDatePicker.setValue(null);
+        endDatePicker.setValue(null);
+    }
+
+    @FXML
+    protected void handleShowInsertRental() {
+        clearInsertRentalFields();
+        showPane(insertRentalPane);
+    }
+
+    @FXML
+    protected void handleInsertRental() {
+        try {
+            // Validate inputs
+            int customerId = Integer.parseInt(customerIdField.getText().trim());
+            int carId = Integer.parseInt(carIdField.getText().trim());
+            LocalDate startDate = startDatePicker.getValue();
+            LocalDate endDate = endDatePicker.getValue();
+            float totalCost = Float.parseFloat(totalCostField.getText().trim());
+
+            // Validate date range
+            if (startDate == null || endDate == null) {
+                showAlert("Invalid Input", "Please select both start and end dates.", Alert.AlertType.ERROR);
+                return;
+            }
+
+            // Create JSON object for rental
+            JSONObject rentalJson = new JSONObject();
+            rentalJson.put("customerID", customerId);
+            rentalJson.put("carID", carId);
+            rentalJson.put("startDate", startDate.toString());
+            rentalJson.put("endDate", endDate.toString());
+            rentalJson.put("totalCost", totalCost);
+
+            // Send the rental data to the server
+            try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT);
+                 DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+                 DataInputStream dis = new DataInputStream(socket.getInputStream())) {
+
+                dos.writeUTF("INSERT_RENTAL");
+                dos.writeUTF(rentalJson.toString());
+
+                // Receive response from server
+                String response = dis.readUTF();
+                JSONObject jsonResponse = new JSONObject(response);
+
+                if (jsonResponse.has("error")) {
+                    showAlert("Error", jsonResponse.getString("error"), Alert.AlertType.ERROR);
+                } else {
+                    showAlert("Success", "Rental added successfully!", Alert.AlertType.INFORMATION);
+                    clearInsertRentalFields();
+                    showPane(mainMenuPane);
+                }
+            }
+        } catch (NumberFormatException e) {
+            showAlert("Invalid Input", "Customer ID, Car ID and Cost must be numbers.", Alert.AlertType.ERROR);
+        } catch (IOException e) {
+            showAlert("Connection Error", "Failed to connect to server: " + e.getMessage(), Alert.AlertType.ERROR);
+        } catch (Exception e) {
+            showAlert("Error", e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 }
