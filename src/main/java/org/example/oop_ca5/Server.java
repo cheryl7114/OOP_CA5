@@ -2,7 +2,9 @@ package org.example.oop_ca5;
 
 import org.example.oop_ca5.DAOs.MySqlCarDao;
 import org.example.oop_ca5.DAOs.MySqlImageDao;
+import org.example.oop_ca5.DAOs.MySqlRentalDao;
 import org.example.oop_ca5.DTOs.Car;
+import org.example.oop_ca5.DTOs.Rental;
 import org.example.oop_ca5.DTOs.ImageMetadata;
 import org.example.oop_ca5.Exceptions.DaoException;
 import org.example.oop_ca5.Utilities.JSONConverter;
@@ -10,6 +12,7 @@ import org.json.JSONObject;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.time.LocalDate;
 import java.util.List;
 
 public class Server {
@@ -55,7 +58,11 @@ public class Server {
                 handleGetImagesList(dataOutputStream);
             } else if ("GET_IMAGE".equals(command)) {
                 handleGetImage(dataInputStream, dataOutputStream);
-            } else if (command.equals("EXIT")) {
+            } else if ("GET_ALL_RENTALS".equals(command)) {
+                handleGetAllRentals(dataOutputStream);
+            } else if ("INSERT_RENTAL".equals(command)) {
+                handleInsertRental(dataInputStream, dataOutputStream);
+            }else if (command.equals("EXIT")) {
                 System.out.println("Client disconnected: " + clientSocket.getInetAddress());
             } else {
                 System.out.println("Invalid command: " + command);
@@ -219,6 +226,7 @@ public class Server {
             dos.writeUTF(errorJson.toString());
         }
     }
+
     // method to handle when client selects an image
     public void handleGetImage(DataInputStream dis, DataOutputStream dos) throws IOException {
         try {
@@ -259,4 +267,48 @@ public class Server {
         }
     }
 
+    private void handleGetAllRentals(DataOutputStream dos) throws IOException {
+        try {
+            MySqlRentalDao rentalDao = new MySqlRentalDao();
+            List<Rental> rentals = rentalDao.loadAllRentals();
+            String jsonString = JSONConverter.rentalListToJSONString(rentals);
+            dos.writeUTF(jsonString);
+        } catch (DaoException e) {
+            JSONObject err = new JSONObject();
+            err.put("error", e.getMessage());
+            dos.writeUTF(err.toString());
+        }
+    }
+
+    private void handleInsertRental(DataInputStream dis, DataOutputStream dos) {
+        try {
+            String jsonReq = dis.readUTF();
+            JSONObject j = new JSONObject(jsonReq);
+
+            // parse fields
+            int customerID = j.getInt("customerID");
+            int carID = j.getInt("carID");
+            LocalDate start = LocalDate.parse(j.getString("startDate"));
+            LocalDate end = LocalDate.parse(j.getString("endDate"));
+            float cost = (float) j.getDouble("totalCost");
+
+            // build DTO and save
+            Rental rental = new Rental(customerID, carID, start, end, cost);
+            MySqlRentalDao dao = new MySqlRentalDao();
+            dao.insertRental(rental);
+
+            // send back the created rental as JSON
+            String resp = JSONConverter.rentalObjectToJSONString(rental);
+            dos.writeUTF(resp);
+
+        } catch (DaoException e) {
+            JSONObject err = new JSONObject();
+            err.put("error", "DAO Error: " + e.getMessage());
+            try { dos.writeUTF(err.toString()); } catch (IOException ignored) {}
+        } catch (Exception e) {
+            JSONObject err = new JSONObject();
+            err.put("error", "Error: " + e.getMessage());
+            try { dos.writeUTF(err.toString()); } catch (IOException ignored) {}
+        }
+    }
 }
