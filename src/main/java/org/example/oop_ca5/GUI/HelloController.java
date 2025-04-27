@@ -72,6 +72,19 @@ public class HelloController {
     @FXML
     private TableColumn<Car, Boolean> availableColumn;
 
+    //Fields for insert car
+    @FXML private VBox insertCarPane;
+
+    @FXML private TextField makeField;
+
+    @FXML private TextField modelField;
+
+    @FXML private TextField yearField;
+
+    @FXML private TextField priceField;
+
+    @FXML private ComboBox<String> availableComboBox;
+
     @FXML
     public void initialize() {
         // Initialize TableView columns using the DTO Car class
@@ -107,6 +120,9 @@ public class HelloController {
                 }
             }
         });
+
+        availableComboBox.setItems(FXCollections.observableArrayList("Yes", "No"));
+        availableComboBox.getSelectionModel().selectFirst();
     }
 
     @FXML
@@ -242,6 +258,7 @@ public class HelloController {
         // Hide all panes
         mainMenuPane.setVisible(false);
         carDetailsPane.setVisible(false);
+        insertCarPane.setVisible(false);
         allCarsPane.setVisible(false);
 
         // Show requested pane
@@ -255,4 +272,68 @@ public class HelloController {
         alert.setContentText(content);
         alert.showAndWait();
     }
+
+    @FXML
+    protected void handleShowInsertCar() {
+        clearInsertFields();
+        showPane(insertCarPane);
+    }
+
+    @FXML
+    protected void handleInsertCar() {
+        try {
+            // Validate inputs
+            String make = makeField.getText().trim();
+            String model = modelField.getText().trim();
+            int year = Integer.parseInt(yearField.getText().trim());
+            float price = Float.parseFloat(priceField.getText().trim());
+            boolean available = availableComboBox.getValue().equals("Yes");
+
+            if (make.isEmpty() || model.isEmpty()) {
+                showAlert("Invalid Input", "Make and Model cannot be empty", Alert.AlertType.ERROR);
+                return;
+            }
+
+            JSONObject carJson = new JSONObject();
+            carJson.put("make", make);
+            carJson.put("model", model);
+            carJson.put("year", year);
+            carJson.put("rentalPricePerDay", price);
+            carJson.put("availability", available);
+
+            try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT);
+                 DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+                 DataInputStream dis = new DataInputStream(socket.getInputStream())) {
+
+                dos.writeUTF("INSERT_CAR");
+                dos.writeUTF(carJson.toString());
+
+                String response = dis.readUTF();
+                JSONObject jsonResponse = new JSONObject(response);
+
+                if (jsonResponse.has("error")) {
+                    showAlert("Error", jsonResponse.getString("error"), Alert.AlertType.ERROR);
+                } else {
+                    showAlert("Success", "Car added successfully!", Alert.AlertType.INFORMATION);
+                    clearInsertFields();
+                    showPane(mainMenuPane);
+                }
+            }
+        } catch (NumberFormatException e) {
+            showAlert("Invalid Input", "Please enter valid numbers for Year and Price", Alert.AlertType.ERROR);
+        } catch (IOException e) {
+            showAlert("Connection Error", "Failed to connect to server: " + e.getMessage(), Alert.AlertType.ERROR);
+        } catch (Exception e) {
+            showAlert("Error", "Failed to add car: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    private void clearInsertFields() {
+        makeField.clear();
+        modelField.clear();
+        yearField.clear();
+        priceField.clear();
+        availableComboBox.getSelectionModel().selectFirst();
+    }
+
 }
