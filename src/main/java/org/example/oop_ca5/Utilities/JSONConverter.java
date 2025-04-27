@@ -1,6 +1,7 @@
 package org.example.oop_ca5.Utilities;
 
 import org.example.oop_ca5.DTOs.Car;
+import org.example.oop_ca5.DTOs.Rental;
 import org.example.oop_ca5.DTOs.ImageMetadata;
 import org.example.oop_ca5.Exceptions.DaoException;
 import org.json.JSONArray;
@@ -73,5 +74,41 @@ public class JSONConverter {
         jsonImage.put("carID", image.getCarID());
 
         return jsonImage;
+    }
+
+    // Convert list of rental objects to JSON string
+    public static String rentalListToJSONString(List<Rental> rentalList) throws DaoException {
+        try {
+            JSONArray jsonArray = new JSONArray();
+            for (Rental rental : rentalList) {
+                JSONObject rentalJson = rentalToJSONObject(rental);
+                jsonArray.put(rentalJson);
+            }
+            return jsonArray.toString(4);
+        } catch (Exception e) {
+            throw new DaoException("Error converting rental list to JSON " + e.getMessage());
+        }
+    }
+
+    // Convert single rental object to JSON string
+    public static String rentalObjectToJSONString(Rental rental) throws DaoException {
+        try {
+            JSONObject rentalJson = rentalToJSONObject(rental);
+            return rentalJson.toString(4);
+        } catch (Exception e) {
+            throw new DaoException("Error converting rental to JSON " + e.getMessage());
+        }
+    }
+
+    // Helper to convert rental object to JSON object
+    public static JSONObject rentalToJSONObject(Rental rental) {
+        JSONObject json = new JSONObject();
+        json.put("rentalID", rental.getRentalID());
+        json.put("customerID", rental.getCustomerID());
+        json.put("carID", rental.getCarID());
+        json.put("startDate", rental.getStartDate().toString());
+        json.put("endDate", rental.getEndDate().toString());
+        json.put("totalCost", rental.getTotalCost());
+        return json;
     }
 }
