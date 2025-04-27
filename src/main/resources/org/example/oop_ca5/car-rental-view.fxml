@@ -163,8 +163,8 @@
             <Label text="Customer ID:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
             <TextField fx:id="customerIdField" GridPane.columnIndex="1" GridPane.rowIndex="0" style="-fx-min-width: 200;"/>
 
-            <Label text="Car ID:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-            <TextField fx:id="carIdField" GridPane.columnIndex="1" GridPane.rowIndex="1" style="-fx-min-width: 200;"/>
+            <Label text="Car:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+            <ComboBox fx:id="carComboBox" GridPane.columnIndex="1" GridPane.rowIndex="1" promptText="Select a car…" style="-fx-min-width: 200;"/>
 
             <Label text="Total Cost:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
             <TextField fx:id="totalCostField" GridPane.columnIndex="1" GridPane.rowIndex="2" style="-fx-min-width: 200;"/>

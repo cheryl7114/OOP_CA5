@@ -285,30 +285,33 @@ public class Server {
             String jsonReq = dis.readUTF();
             JSONObject j = new JSONObject(jsonReq);
 
-            // parse fields
             int customerID = j.getInt("customerID");
             int carID = j.getInt("carID");
             LocalDate start = LocalDate.parse(j.getString("startDate"));
             LocalDate end = LocalDate.parse(j.getString("endDate"));
             float cost = (float) j.getDouble("totalCost");
 
-            // build DTO and save
+            // insert rental
             Rental rental = new Rental(customerID, carID, start, end, cost);
-            MySqlRentalDao dao = new MySqlRentalDao();
-            dao.insertRental(rental);
+            MySqlRentalDao rentalDao = new MySqlRentalDao();
+            rentalDao.insertRental(rental);
 
-            // send back the created rental as JSON
+            // now mark the car unavailable
+            MySqlCarDao carDao = new MySqlCarDao();
+            Car car = carDao.findCarById(carID);
+            car.setAvailability(false);
+            carDao.updateCar(car);
+
+            // send back the rental
             String resp = JSONConverter.rentalObjectToJSONString(rental);
             dos.writeUTF(resp);
 
         } catch (DaoException e) {
             JSONObject err = new JSONObject();
             err.put("error", "DAO Error: " + e.getMessage());
-            try { dos.writeUTF(err.toString()); } catch (IOException ignored) {}
+
         } catch (Exception e) {
             JSONObject err = new JSONObject();
             err.put("error", "Error: " + e.getMessage());
-            try { dos.writeUTF(err.toString()); } catch (IOException ignored) {}
         }
-    }
-}
+    }}

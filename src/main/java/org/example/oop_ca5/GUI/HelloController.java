@@ -6,14 +6,17 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.example.oop_ca5.DAOs.MySqlCarDao;
 import org.example.oop_ca5.DTOs.Car;
 import org.example.oop_ca5.DTOs.Rental;
+import org.example.oop_ca5.Exceptions.DaoException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.net.Socket;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 public class HelloController {
@@ -52,8 +55,9 @@ public class HelloController {
     @FXML private TableColumn<Rental,Float> totalCostColumn;
 
     // Insert Rental fields
-    @FXML private TextField customerIdField, carIdField, totalCostField;
+    @FXML private TextField customerIdField, totalCostField;
     @FXML private DatePicker startDatePicker, endDatePicker;
+    @FXML private ComboBox<Car> carComboBox;
 
     // Insert Car fields
     @FXML private TextField makeField;
@@ -124,6 +128,14 @@ public class HelloController {
                 }
             }
         });
+
+        try {
+            MySqlCarDao carDao = new MySqlCarDao();
+            List<Car> availableCars = carDao.getAvailableCars();
+            carComboBox.setItems(FXCollections.observableArrayList(availableCars));
+        } catch (DaoException e) {
+            showAlert("Error", "Could not load available cars: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
     }
 
     @FXML
@@ -586,7 +598,7 @@ public class HelloController {
 
     private void clearInsertRentalFields() {
         customerIdField.clear();
-        carIdField.clear();
+        carComboBox.getSelectionModel().clearSelection();
         totalCostField.clear();
         startDatePicker.setValue(null);
         endDatePicker.setValue(null);
@@ -595,6 +607,14 @@ public class HelloController {
     @FXML
     protected void handleShowInsertRental() {
         clearInsertRentalFields();
+        // reload available cars each time the pane is shown
+        try {
+            MySqlCarDao carDao = new MySqlCarDao();
+            List<Car> availableCars = carDao.getAvailableCars();
+            carComboBox.setItems(FXCollections.observableArrayList(availableCars));
+        } catch (DaoException e) {
+            showAlert("Error", "Could not load available cars: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
         showPane(insertRentalPane);
     }
 
@@ -603,7 +623,12 @@ public class HelloController {
         try {
             // Validate inputs
             int customerId = Integer.parseInt(customerIdField.getText().trim());
-            int carId = Integer.parseInt(carIdField.getText().trim());
+            Car selected = carComboBox.getValue();
+            if (selected == null) {
+                showAlert("Invalid Input", "Please select a car.", Alert.AlertType.ERROR);
+                return;
+            }
+            int carId = selected.getCarId();
             LocalDate startDate = startDatePicker.getValue();
             LocalDate endDate = endDatePicker.getValue();
             float totalCost = Float.parseFloat(totalCostField.getText().trim());
@@ -611,6 +636,12 @@ public class HelloController {
             // Validate date range
             if (startDate == null || endDate == null) {
                 showAlert("Invalid Input", "Please select both start and end dates.", Alert.AlertType.ERROR);
+                return;
+            }
+
+            // Check if end date is after start date
+            if (endDate.isBefore(startDate)) {
+                showAlert("Invalid Date Range", "End date must be after the start date.", Alert.AlertType.ERROR);
                 return;
             }
 
