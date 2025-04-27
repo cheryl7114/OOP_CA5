@@ -19,6 +19,8 @@
 
         <Button text="Add New Car" style="-fx-min-width: 200; -fx-min-height: 40;" onAction="#handleShowInsertCar"/>
 
+        <Button text="Delete Car" style="-fx-min-width: 200; -fx-min-height: 40;" onAction="#handleShowDeleteCar"/>
+
         <Button text="Exit" style="-fx-min-width: 200; -fx-min-height: 40;" onAction="#handleExit"/>
     </VBox>
 
@@ -71,27 +73,22 @@
         <Text text="Add New Car" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
 
         <GridPane hgap="10" vgap="10" alignment="CENTER">
-            <!-- Row 0 - Make -->
             <Label text="Make:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
             <TextField fx:id="makeField" GridPane.columnIndex="1" GridPane.rowIndex="0"
                        style="-fx-min-width: 200;"/>
 
-            <!-- Row 1 - Model -->
             <Label text="Model:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
             <TextField fx:id="modelField" GridPane.columnIndex="1" GridPane.rowIndex="1"
                        style="-fx-min-width: 200;"/>
 
-            <!-- Row 2 - Year -->
             <Label text="Year:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
             <TextField fx:id="yearField" GridPane.columnIndex="1" GridPane.rowIndex="2"
                        style="-fx-min-width: 200;"/>
 
-            <!-- Row 3 - Price -->
             <Label text="Price/Day:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
             <TextField fx:id="priceField" GridPane.columnIndex="1" GridPane.rowIndex="3"
                        style="-fx-min-width: 200;"/>
 
-            <!-- Row 4 - Availability -->
             <Label text="Available:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
             <ComboBox fx:id="availableComboBox" GridPane.columnIndex="1" GridPane.rowIndex="4"
                       style="-fx-min-width: 200;"/>
@@ -99,6 +96,22 @@
 
         <HBox spacing="10" alignment="CENTER">
             <Button text="Submit" style="-fx-min-width: 100;" onAction="#handleInsertCar"/>
+            <Button text="Back" style="-fx-min-width: 100;" onAction="#handleBackToMenu"/>
+        </HBox>
+    </VBox>
+
+    <!-- Delete Car Pane -->
+    <VBox fx:id="deleteCarPane" spacing="20" alignment="CENTER" style="-fx-padding: 20;" visible="false">
+        <Text text="Delete Car" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
+
+        <GridPane hgap="10" vgap="10" alignment="CENTER">
+            <Label text="Enter Car ID to Delete:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+            <TextField fx:id="deleteIdField" GridPane.columnIndex="1" GridPane.rowIndex="0"
+                       style="-fx-min-width: 200;"/>
+        </GridPane>
+
+        <HBox spacing="10" alignment="CENTER">
+            <Button text="Delete" style="-fx-min-width: 100;" onAction="#handleDeleteCar"/>
             <Button text="Back" style="-fx-min-width: 100;" onAction="#handleBackToMenu"/>
         </HBox>
     </VBox>

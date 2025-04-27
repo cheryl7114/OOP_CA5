@@ -85,6 +85,11 @@ public class HelloController {
 
     @FXML private ComboBox<String> availableComboBox;
 
+    //Delete Car
+    @FXML private VBox deleteCarPane;
+
+    @FXML private TextField deleteIdField;
+
     @FXML
     public void initialize() {
         // Initialize TableView columns using the DTO Car class
@@ -259,6 +264,7 @@ public class HelloController {
         mainMenuPane.setVisible(false);
         carDetailsPane.setVisible(false);
         insertCarPane.setVisible(false);
+        deleteCarPane.setVisible(false);
         allCarsPane.setVisible(false);
 
         // Show requested pane
@@ -336,4 +342,54 @@ public class HelloController {
         availableComboBox.getSelectionModel().selectFirst();
     }
 
+    @FXML
+    protected void handleShowDeleteCar() {
+        deleteIdField.clear();
+        showPane(deleteCarPane);
+    }
+
+    @FXML
+    protected void handleDeleteCar() {
+        String carIdStr = deleteIdField.getText().trim();
+
+        if (carIdStr.isEmpty()) {
+            showAlert("Invalid Input", "Please enter a Car ID", Alert.AlertType.ERROR);
+            return;
+        }
+
+        try {
+            int carId = Integer.parseInt(carIdStr);
+
+            try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT);
+                 DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+                 DataInputStream dis = new DataInputStream(socket.getInputStream())) {
+
+                // Create JSON request
+                JSONObject jsonRequest = new JSONObject();
+                jsonRequest.put("carID", carId);
+
+                // Send command
+                dos.writeUTF("DELETE_CAR");
+                dos.writeUTF(jsonRequest.toString());
+
+                // Handle response
+                String response = dis.readUTF();
+                JSONObject jsonResponse = new JSONObject(response);
+
+                if (jsonResponse.has("error")) {
+                    showAlert("Error", jsonResponse.getString("error"), Alert.AlertType.ERROR);
+                } else {
+                    showAlert("Success", jsonResponse.getString("message"), Alert.AlertType.INFORMATION);
+                    deleteIdField.clear();
+                    showPane(mainMenuPane);
+                }
+            }
+        } catch (NumberFormatException e) {
+            showAlert("Invalid Input", "Please enter a valid number for Car ID", Alert.AlertType.ERROR);
+        } catch (IOException e) {
+            showAlert("Connection Error", "Failed to connect to server: " + e.getMessage(), Alert.AlertType.ERROR);
+        } catch (Exception e) {
+            showAlert("Error", "Failed to delete car: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
 }
