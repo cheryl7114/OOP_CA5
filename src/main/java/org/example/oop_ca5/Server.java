@@ -47,6 +47,10 @@ public class Server {
                 handleFindCarRequest(dataInputStream, dataOutputStream);
             } else if ("GET_ALL_CARS".equals(command)) {
                 handleGetAllCarsRequest(dataOutputStream);
+            } else if ("INSERT_CAR".equals(command)) {
+                handleInsertCarRequest(dataInputStream, dataOutputStream);
+            } else if ("DELETE_CAR".equals(command)) {
+                handleDeleteCarRequest(dataInputStream, dataOutputStream);
             } else if ("GET_IMAGES_LIST".equals(command)) {
                 handleGetImagesList(dataOutputStream);
             } else if ("GET_IMAGE".equals(command)) {
@@ -101,7 +105,7 @@ public class Server {
         }
     }
 
-    private void handleInsertCarRequest() {
+    private void handleInsertCarRequest(DataInputStream dataInputStream, DataOutputStream dataOutputStream) {
         try {
             String jsonCar = dataInputStream.readUTF();
             JSONObject json = new JSONObject(jsonCar);
@@ -152,6 +156,51 @@ public class Server {
                 dataOutputStream.writeUTF(error.toString());
             } catch (IOException ex) {
                 System.err.println("Failed to send error: " + ex.getMessage());
+            }
+        }
+    }
+
+    private void handleDeleteCarRequest(DataInputStream dataInputStream, DataOutputStream dataOutputStream) {
+        try {
+
+            String jsonInput = dataInputStream.readUTF();
+            JSONObject json = new JSONObject(jsonInput);
+            int carId = json.getInt("carID");
+
+            MySqlCarDao carDao = new MySqlCarDao();
+            carDao.deleteCarById(carId); // Will throw DaoException if deletion fails
+
+            JSONObject successJson = new JSONObject();
+            successJson.put("status", "success");
+            successJson.put("message", "Car with ID " + carId + " deleted successfully.");
+            dataOutputStream.writeUTF(successJson.toString());
+
+        } catch (DaoException e) {
+            try {
+                JSONObject error = new JSONObject();
+                error.put("status", "error");
+                error.put("message", e.getMessage());
+                dataOutputStream.writeUTF(error.toString());
+            } catch (IOException ex) {
+                System.err.println("Failed to send DAO error: " + ex.getMessage());
+            }
+        } catch (org.json.JSONException e) {
+            try {
+                JSONObject error = new JSONObject();
+                error.put("status", "error");
+                error.put("message", "Invalid JSON: " + e.getMessage());
+                dataOutputStream.writeUTF(error.toString());
+            } catch (IOException ex) {
+                System.err.println("Failed to send JSON error: " + ex.getMessage());
+            }
+        } catch (IOException e) {
+            try {
+                JSONObject error = new JSONObject();
+                error.put("status", "error");
+                error.put("message", "IO Error: " + e.getMessage());
+                dataOutputStream.writeUTF(error.toString());
+            } catch (IOException ex) {
+                System.err.println("Failed to send IO error: " + ex.getMessage());
             }
         }
     }

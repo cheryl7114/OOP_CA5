@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.*;
 import java.net.Socket;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Client {
@@ -22,7 +23,7 @@ public class Client {
             if (scanner.hasNextInt()) {
                 int choice = scanner.nextInt();
                 // exit client menu and notify server
-                if (choice == 6) {
+                if (choice == 7) {
                     System.out.println("Exiting...");
 
                     try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT);
@@ -48,6 +49,8 @@ public class Client {
                         handleDownloadAllImages(dos, dis);
                     } else if (choice == 5) {
                         handleInsertCar(scanner, dos, dis);
+                    }else if (choice == 6) {
+                        handleDeleteCar(scanner, dos, dis);
                     } else {
                         System.out.println("Invalid choice! Enter a number 1-5");
                     }
@@ -70,7 +73,8 @@ public class Client {
         System.out.println("3. View available images");
         System.out.println("4. Download all images");
         System.out.println("5. Add a Car");
-        System.out.println("6. Exit");
+        System.out.println("6. Delete Car by ID");
+        System.out.println("7. Exit");
         System.out.println("=============================");
         System.out.print("Enter your choice: ");
     }
@@ -137,7 +141,6 @@ public class Client {
             System.out.print("Available (true/false): ");
             boolean available = scanner.nextBoolean();
 
-            // Build JSON using the same structure as JSONConverter.carToJSONObject()
             JSONObject carJson = new JSONObject();
             carJson.put("make", make);
             carJson.put("model", model);
@@ -145,18 +148,15 @@ public class Client {
             carJson.put("rentalPricePerDay", rentalPrice);
             carJson.put("availability", available);
 
-            // Send command and JSON
             dos.writeUTF("INSERT_CAR");
             dos.writeUTF(carJson.toString());
 
-            // Process server response
             String response = dis.readUTF();
             JSONObject jsonResponse = new JSONObject(response);
 
             if (jsonResponse.has("error")) {
                 System.out.println("Error: " + jsonResponse.getString("error"));
             } else {
-                // Use consistent key names from JSONConverter.carToJSONObject()
                 System.out.println("\nCar added successfully:");
                 System.out.println("ID: " + jsonResponse.getInt("carID"));
                 System.out.println("Make: " + jsonResponse.getString("make"));
@@ -167,6 +167,34 @@ public class Client {
             }
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    private void handleDeleteCar(Scanner scanner, DataOutputStream dos, DataInputStream dis) {
+        try {
+            System.out.print("\nEnter Car ID to delete: ");
+            int carId = scanner.nextInt();
+
+            JSONObject jsonRequest = new JSONObject();
+            jsonRequest.put("carID", carId);
+
+            dos.writeUTF("DELETE_CAR");
+            dos.writeUTF(jsonRequest.toString());
+
+            String response = dis.readUTF();
+            JSONObject jsonResponse = new JSONObject(response);
+
+            if (jsonResponse.has("error")) {
+                System.out.println("Error: " + jsonResponse.getString("error"));
+            } else {
+                System.out.println("Success: " + jsonResponse.getString("message"));
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input! Please enter a number.");
+            scanner.next();
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            scanner.next();
         }
     }
 
