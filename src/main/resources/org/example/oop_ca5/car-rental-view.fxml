@@ -21,10 +21,12 @@
 
         <Button text="Delete Car" style="-fx-min-width: 200; -fx-min-height: 40;" onAction="#handleShowDeleteCar"/>
 
+        <Button text="View and Download Images" style="-fx-min-width: 200; -fx-min-height: 40;" onAction="#handleViewDownloadImages"/>
+
         <Button text="Exit" style="-fx-min-width: 200; -fx-min-height: 40;" onAction="#handleExit"/>
     </VBox>
 
-    <!-- Car Details Pane (Initially hidden) -->
+    <!-- Car Details Pane -->
     <VBox fx:id="carDetailsPane" spacing="20" alignment="CENTER" style="-fx-padding: 20;" visible="false">
         <Text text="Car Details" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
 
@@ -51,7 +53,7 @@
         <Button text="Back to Menu" onAction="#handleBackToMenu" style="-fx-min-width: 150;"/>
     </VBox>
 
-    <!-- All Cars Pane (Initially hidden) -->
+    <!-- All Cars Pane -->
     <VBox fx:id="allCarsPane" spacing="20" alignment="CENTER" style="-fx-padding: 20;" visible="false">
         <Text text="All Cars" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
 
@@ -69,6 +71,7 @@
         <Button text="Back to Menu" onAction="#handleBackToMenu" style="-fx-min-width: 150;"/>
     </VBox>
 
+    <!--  Insert Car Pane  -->
     <VBox fx:id="insertCarPane" spacing="20" alignment="CENTER" style="-fx-padding: 20;" visible="false">
         <Text text="Add New Car" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
 
@@ -114,5 +117,19 @@
             <Button text="Delete" style="-fx-min-width: 100;" onAction="#handleDeleteCar"/>
             <Button text="Back" style="-fx-min-width: 100;" onAction="#handleBackToMenu"/>
         </HBox>
+    </VBox>
+
+    <!-- View and Download Images Pane -->
+    <VBox fx:id="viewDownloadImagesPane" spacing="20" alignment="CENTER" style="-fx-padding: 20;" visible="false">
+        <Text text="Available Images" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
+
+        <TextArea fx:id="imagesListTextArea" editable="false" wrapText="true" style="-fx-min-width: 400; -fx-min-height: 300;"/>
+
+        <HBox spacing="10" alignment="CENTER">
+            <Button text="Download Selected Image" style="-fx-min-width: 150;" onAction="#handleViewDownloadImages"/>
+            <Button text="Download All Images" style="-fx-min-width: 150;" onAction="#handleViewDownloadImages"/>
+        </HBox>
+
+        <Button text="Back to Menu" style="-fx-min-width: 150;" onAction="#handleBackToMenu"/>
     </VBox>
 </StackPane>

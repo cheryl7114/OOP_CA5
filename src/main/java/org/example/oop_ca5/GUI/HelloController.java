@@ -10,9 +10,7 @@ import org.example.oop_ca5.DTOs.Car;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.util.Optional;
 
@@ -390,6 +388,164 @@ public class HelloController {
             showAlert("Connection Error", "Failed to connect to server: " + e.getMessage(), Alert.AlertType.ERROR);
         } catch (Exception e) {
             showAlert("Error", "Failed to delete car: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    @FXML
+    protected void handleViewDownloadImages() {
+        try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT);
+             DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+             DataInputStream dis = new DataInputStream(socket.getInputStream())) {
+
+            dos.writeUTF("GET_IMAGES_LIST");
+
+            String jsonResponse = dis.readUTF();
+            JSONArray jsonArray = new JSONArray(jsonResponse);
+
+            if (jsonArray.length() == 0) {
+                showAlert("No Images", "No images available.", Alert.AlertType.INFORMATION);
+                return;
+            }
+
+            // Build the list to show
+            StringBuilder imagesList = new StringBuilder("Available Images:\n\n");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject img = jsonArray.getJSONObject(i);
+                imagesList.append(String.format("%d. %s (Car ID: %d)\n",
+                        i + 1,
+                        img.getString("name"),
+                        img.getInt("carID")));
+            }
+
+            // Create choice dialog with two options
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Download Options");
+            alert.setHeaderText(imagesList.toString());
+            alert.setContentText("Choose your download option:");
+
+            ButtonType downloadOne = new ButtonType("Download One Image");
+            ButtonType downloadAll = new ButtonType("Download All Images");
+            ButtonType cancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+            alert.getButtonTypes().setAll(downloadOne, downloadAll, cancel);
+
+            Optional<ButtonType> result = alert.showAndWait();
+
+            if (result.isPresent()) {
+                if (result.get() == downloadOne) {
+                    // Download one image
+                    TextInputDialog inputDialog = new TextInputDialog();
+                    inputDialog.setTitle("Download One Image");
+                    inputDialog.setHeaderText(imagesList.toString());
+                    inputDialog.setContentText("Enter image number:");
+
+                    Optional<String> inputResult = inputDialog.showAndWait();
+                    if (inputResult.isPresent()) {
+                        try {
+                            int choice = Integer.parseInt(inputResult.get());
+
+                            if (choice > 0 && choice <= jsonArray.length()) {
+                                String filename = jsonArray.getJSONObject(choice - 1).getString("filename");
+
+                                if (downloadImage(filename)) {
+                                    showAlert("Success", "Image downloaded successfully.", Alert.AlertType.INFORMATION);
+                                } else {
+                                    showAlert("Failed", "Image download failed.", Alert.AlertType.ERROR);
+                                }
+                            } else {
+                                showAlert("Invalid Choice", "Invalid image number.", Alert.AlertType.WARNING);
+                            }
+
+                        } catch (NumberFormatException e) {
+                            showAlert("Invalid Input", "Please enter a valid number.", Alert.AlertType.ERROR);
+                        }
+                    }
+
+                } else if (result.get() == downloadAll) {
+                    // Download all images
+                    int successCount = 0, failCount = 0;
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject img = jsonArray.getJSONObject(i);
+                        String filename = img.getString("filename");
+
+                        if (downloadImage(filename)) {
+                            successCount++;
+                        } else {
+                            failCount++;
+                        }
+                    }
+
+                    showAlert("Download Summary", String.format(
+                            "Downloaded: %d\nFailed: %d", successCount, failCount), Alert.AlertType.INFORMATION);
+                }
+            }
+
+        } catch (IOException e) {
+            showAlert("Connection Error", "Failed to connect to server: " + e.getMessage(), Alert.AlertType.ERROR);
+        } catch (Exception e) {
+            showAlert("Error", "Failed to process images: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    private boolean downloadImage(String filename) {
+        try {
+            File downloadsDir = new File("downloads");
+            if (!downloadsDir.exists()) {
+                downloadsDir.mkdir();
+            }
+
+            File outputFile = new File(downloadsDir, filename);
+
+            // Check if file already exists
+            if (outputFile.exists()) {
+                Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                confirmAlert.setTitle("File Exists");
+                confirmAlert.setHeaderText("The file already exists");
+                confirmAlert.setContentText("Do you want to download and replace it?");
+
+                Optional<ButtonType> result = confirmAlert.showAndWait();
+                if (result.isPresent() && result.get() != ButtonType.OK) {
+                    // If user chooses not to overwrite, return true to prevent error message and exit
+                    return true;
+                }
+            }
+
+            // Only connect to server if we're actually going to download
+            Socket socket = new Socket(SERVER_HOST, SERVER_PORT);
+            DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+            DataInputStream dis = new DataInputStream(socket.getInputStream());
+
+            dos.writeUTF("GET_IMAGE");
+            dos.writeUTF(filename);
+
+            boolean success = dis.readBoolean();
+            if (!success) {
+                socket.close();
+                return false;
+            }
+
+            long fileSize = dis.readLong();
+
+            try (FileOutputStream fos = new FileOutputStream(outputFile);
+                 BufferedOutputStream bos = new BufferedOutputStream(fos)) {
+
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                long totalRead = 0;
+
+                while (totalRead < fileSize && (bytesRead = dis.read(buffer)) != -1) {
+                    bos.write(buffer, 0, bytesRead);
+                    totalRead += bytesRead;
+                }
+            }
+
+            socket.close();
+            return true;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }
