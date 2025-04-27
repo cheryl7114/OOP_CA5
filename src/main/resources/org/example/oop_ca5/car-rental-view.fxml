@@ -132,4 +132,49 @@
 
         <Button text="Back to Menu" style="-fx-min-width: 150;" onAction="#handleBackToMenu"/>
     </VBox>
+
+    <!-- All Rentals Pane -->
+    <VBox fx:id="allRentalsPane" spacing="20" alignment="CENTER" style="-fx-padding: 20;" visible="false">
+        <Text text="All Rentals" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
+
+        <TableView fx:id="rentalsTableView">
+            <columns>
+                <TableColumn fx:id="rentalIdColumn" text="Rental ID" />
+                <TableColumn fx:id="customerIdColumn" text="Customer ID" />
+                <TableColumn fx:id="carIdRentalColumn" text="Car ID" />
+                <TableColumn fx:id="startDateColumn" text="Start Date" />
+                <TableColumn fx:id="endDateColumn" text="End Date" />
+                <TableColumn fx:id="totalCostColumn" text="Total Cost" />
+            </columns>
+        </TableView>
+
+        <Button text="Back to Menu" onAction="#handleBackToMenu" style="-fx-min-width: 150;"/>
+    </VBox>
+
+    <!-- Insert Rental Pane -->
+    <VBox fx:id="insertRentalPane" spacing="20" alignment="CENTER" style="-fx-padding: 20;" visible="false">
+        <Text text="Add New Rental" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
+
+        <GridPane hgap="10" vgap="10" alignment="CENTER">
+            <Label text="Customer ID:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+            <TextField fx:id="customerIdField" GridPane.columnIndex="1" GridPane.rowIndex="0" style="-fx-min-width: 200;"/>
+
+            <Label text="Car ID:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+            <TextField fx:id="carIdField" GridPane.columnIndex="1" GridPane.rowIndex="1" style="-fx-min-width: 200;"/>
+
+            <Label text="Total Cost:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+            <TextField fx:id="totalCostField" GridPane.columnIndex="1" GridPane.rowIndex="2" style="-fx-min-width: 200;"/>
+
+            <Label text="Start Date:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+            <DatePicker fx:id="startDatePicker" GridPane.columnIndex="1" GridPane.rowIndex="3" style="-fx-min-width: 200;"/>
+
+            <Label text="End Date:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+            <DatePicker fx:id="endDatePicker" GridPane.columnIndex="1" GridPane.rowIndex="4" style="-fx-min-width: 200;"/>
+        </GridPane>
+
+        <HBox spacing="10" alignment="CENTER">
+            <Button text="Submit" style="-fx-min-width: 100;" onAction="#handleInsertRental"/>
+            <Button text="Back" style="-fx-min-width: 100;" onAction="#handleBackToMenu"/>
+        </HBox>
+    </VBox>
 </StackPane>
