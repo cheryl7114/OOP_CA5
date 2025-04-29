@@ -4,30 +4,30 @@ import org.example.oop_ca5.DTOs.ImageMetadata;
 import org.example.oop_ca5.Exceptions.DaoException;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MySqlImageDao extends MySqlDao {
     
     public List<ImageMetadata> getAllImages() throws DaoException {
-        Connection conn = null;
-        Statement stmt = null;
-        ResultSet rs = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
         List<ImageMetadata> imagesList = new ArrayList<>();
         
         try {
-            conn = this.getConnection();
-            stmt = conn.createStatement();
+            connection = this.getConnection();
             String query = "SELECT * FROM image";
-            rs = stmt.executeQuery(query);
+            preparedStatement = connection.prepareStatement(query);
+            resultSet = preparedStatement.executeQuery();
             
-            while (rs.next()) {
-                int id = rs.getInt("imageID");
-                String name = rs.getString("name");
-                String filename = rs.getString("filename");
-                int carID = rs.getInt("carID");
+            while (resultSet.next()) {
+                int id = resultSet.getInt("imageID");
+                String name = resultSet.getString("name");
+                String filename = resultSet.getString("filename");
+                int carID = resultSet.getInt("carID");
                 
                 ImageMetadata image = new ImageMetadata(id, name, filename, carID);
                 imagesList.add(image);
@@ -37,9 +37,15 @@ public class MySqlImageDao extends MySqlDao {
             throw new DaoException("Error getting images from database: " + e.getMessage());
         } finally {
             try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
+                if (resultSet != null) {
+                    resultSet.close();
+                }
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+                if (connection != null) {
+                    connection.close();
+                }
             } catch (Exception e) {
                 throw new DaoException("Error closing database resources: " + e.getMessage());
             }
